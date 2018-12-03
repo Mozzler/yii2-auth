@@ -23,4 +23,10 @@ class User extends Base { //implements \yii\web\IdentityInterface {
 		);
 	}
 	
+	public function attributes() {
+		return [
+			'_id', 'name'
+		];
+	}
+	
 }
