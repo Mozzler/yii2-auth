@@ -9,7 +9,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "hosannahighertech/yii2-oauth2-server": "dev-master"
+    },
     "autoload": {
         "psr-4": {
             "mozzler\\auth\\": ""
