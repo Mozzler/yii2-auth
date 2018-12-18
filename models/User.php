@@ -2,16 +2,18 @@
 namespace mozzler\auth\models;
 
 use yii\helpers\ArrayHelper;
+use Yii;
 
 use mozzler\base\models\Model;
 use mozzler\auth\models\behaviors\UserSetNameBehavior;
 use mozzler\auth\models\behaviors\UserSetPasswordHashBehavior;
-use Yii;
+use mozzler\auth\models\behaviors\UserDeletePasswordBehavior;
 
 class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\UserCredentialsInterface {
 
 	public static $moduleClass = '\mozzler\auth\Module';	
 	protected static $collectionName = "mozzler.auth.user";
+	protected static $usernameField = 'email';
 	
 	const SCENARIO_SIGNUP = 'signup';
 	const SCENARIO_LOGIN = 'login';
@@ -20,7 +22,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	{
 		return [
 			'label' => 'User',
-			'labelPlural' => 'Users',
+			'labelPlural' => 'Users'
 		];
 	}
 	
@@ -71,7 +73,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     public function behaviors() {
 	    return ArrayHelper::merge(parent::behaviors(), [
 		    'UserSetNameBehavior' => UserSetNameBehavior::className(),
-		    'UserSetPasswordHash' => UserSetPasswordHashBehavior::className()
+		    'UserSetPasswordHash' => UserSetPasswordHashBehavior::className(),
+		    'UserDeletePassword' => UserDeletePasswordBehavior::className()
 	    ]);
     }
     
@@ -80,28 +83,38 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	 */
     public function checkUserCredentials($username, $password)
     {
-	    // TODO: implement
-	    return true;
+	    $user = $this->findByUsername($username);
+	    return $this->validatePassword($password);
     }
     
     /**
 	 * Required for OAuth2 by `hosannahighertech/yii2-oauth2-server`
 	 */
-    public function getUserDetails($username)
+    public function getUserDetails($id)
     {
+	    $user = $this->findByUsername($username);
+	    $usernameField = $user::$usernameField;
 	    // TODO: Implement
 	    return [
-		    'user_id' => '1a',	// MongoDB ID for the user
+		    'user_id' => $user->$usernameField,	// MongoDB ID for the user
+		    'id' => $user->id,
 		    'scope' => ''		// optional space separated list of scopes
 	    ];
+    }
+    
+    public static function findIdentity($id)
+    {
+	    return $this->findOne($id, false);
     }
     
     /**
      * @see yii\web\IdentityInterface
      */
-    public static function findIdentity($id)
+    public static function findByUsername($id)
     {
-        return static::findOne($id, false);
+	    $filter = [];
+	    $filter[static::$usernameField] = $id;
+        return static::findOne($filter, false);
     }
     
     public static function findIdentityByAccessToken($token, $type = null)
@@ -183,6 +196,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
      */
     public function validatePassword($password)
     {
+	    \Yii::trace($password);
+	    \Yii::trace($this->passwordHash);
         return Yii::$app->getSecurity()->validatePassword($password, $this->passwordHash);
     }
 }
