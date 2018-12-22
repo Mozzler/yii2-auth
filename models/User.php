@@ -73,8 +73,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     public function behaviors() {
 	    return ArrayHelper::merge(parent::behaviors(), [
 		    'UserSetNameBehavior' => UserSetNameBehavior::className(),
-		    'UserSetPasswordHash' => UserSetPasswordHashBehavior::className(),
-		    'UserDeletePassword' => UserDeletePasswordBehavior::className()
+		    'UserSetPasswordHash' => UserSetPasswordHashBehavior::className()
 	    ]);
     }
     
