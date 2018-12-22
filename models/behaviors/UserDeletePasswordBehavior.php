@@ -23,7 +23,6 @@ class UserDeletePasswordBehavior extends AttributeBehavior
      */
     protected function getValue($event)
     {
-	    \Yii::trace('user delete password', __METHOD__);
-        return '';
+        return null;
     }
 }
