@@ -7,13 +7,12 @@ use Yii;
 use mozzler\base\models\Model;
 use mozzler\auth\models\behaviors\UserSetNameBehavior;
 use mozzler\auth\models\behaviors\UserSetPasswordHashBehavior;
-use mozzler\auth\models\behaviors\UserDeletePasswordBehavior;
 
 class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\UserCredentialsInterface {
 
 	public static $moduleClass = '\mozzler\auth\Module';	
 	protected static $collectionName = "mozzler.auth.user";
-	protected static $usernameField = 'email';
+	public static $usernameField = 'email';
 	
 	const SCENARIO_SIGNUP = 'signup';
 	const SCENARIO_LOGIN = 'login';
@@ -48,7 +47,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		$fields['password'] = [
 			'type' => 'Password',
 			'label' => 'Password',
-			'required' => true
+			'required' => true,
+			'save' => false
 		];
 		$fields['passwordHash'] = [
 			'type' => 'Text',
@@ -103,7 +103,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     
     public static function findIdentity($id)
     {
-	    return $this->findOne($id, false);
+	    return self::findOne($id, false);
     }
     
     /**
@@ -127,9 +127,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         $oauthServer->verifyResourceRequest($oauthRequest);
 
         $token = $oauthServer->getAccessTokenData($oauthRequest);
-        $retval = self::findOne($token['user_id'],false);
-
-        return $retval;
+        
+        return self::findByUsername($token['user_id']);
     }
 	
 	/**
@@ -195,8 +194,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
      */
     public function validatePassword($password)
     {
-	    \Yii::trace($password);
-	    \Yii::trace($this->passwordHash);
-        return Yii::$app->getSecurity()->validatePassword($password, $this->passwordHash);
+	    return Yii::$app->getSecurity()->validatePassword($password, $this->passwordHash);
     }
+    
 }

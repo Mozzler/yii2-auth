@@ -3,6 +3,7 @@ namespace mozzler\auth\controllers;
 
 use mozzler\base\controllers\ActiveController;
 use yii\helpers\ArrayHelper;
+use mozzler\auth\models\oauth\OauthAccessToken;
 
 class UserApiController extends ActiveController {
 
@@ -22,7 +23,7 @@ class UserApiController extends ActiveController {
         
         if (isset($params['access_token'])) {
 		    // include the user_id in the access_token response
-		    $tokens = new OauthAccessTokens();
+		    $tokens = new OauthAccessToken();
 		    $params['user_id'] = $tokens->findUserId($params['access_token']);
 	    }
 	    
