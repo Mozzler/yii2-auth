@@ -1,5 +1,7 @@
 <?php
-namespace mozzler\base\controllers;
+namespace mozzler\auth\controllers;
+
+use mozzler\base\controllers\ModelController;
 
 class OauthclientController extends ModelController
 {
