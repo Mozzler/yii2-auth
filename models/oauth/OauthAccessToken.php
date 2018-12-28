@@ -73,19 +73,8 @@ class OauthAccessToken extends \yii\mongodb\ActiveRecord
 	 * Find the UserID for a given access token
 	 */
     public function findUserId($accessToken) {
-	    \Yii::trace('finduser',__METHOD__);
 	    $clientModel = new OAuthClientModel();
-	    /*$oauth = \Yii::$app->getModule("oauth2");
-		$tableName = 'mozzler.auth.clients'; //$oauth->storageConfig['access_token_table'];
-	    
-	    $db = $this->db;
-	    $collection = $db->getCollection($tableName);
-	    //$collection->checkPermissions = false;
-	    $result = $collection->findOne([
-		    'access_token' => $accessToken
-	    ]);
-	    
-	    return $result['user_id'];*/
+
 	    $client = $clientModel->findOne([
 		    'access_token' => $accessToken
 	    ]);

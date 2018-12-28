@@ -10,7 +10,8 @@ class UserWebController extends ModelController {
 	
 	public function actions() {
 		return \yii\helpers\ArrayHelper::merge(parent::actions(), [
-			'login' => 'mozzler\auth\actions\UserLoginAction'
+			'login' => 'mozzler\auth\actions\UserLoginAction',
+			'logout' => 'mozzler\auth\actions\UserLogoutAction'
 		]);
 	}
 	

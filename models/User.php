@@ -66,6 +66,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'createdAt', 'createdUserId'];
 	    $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_CREATE] = ['firstName', 'lastName', 'email', 'password'];
+	    $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
 	    
 	    return $scenarios;
     }
@@ -195,6 +196,11 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     public function validatePassword($password)
     {
 	    return Yii::$app->getSecurity()->validatePassword($password, $this->passwordHash);
+    }
+    
+    public function username() {
+	    $usernameField = self::$usernameField;
+	    return $this->$usernameField;
     }
     
 }

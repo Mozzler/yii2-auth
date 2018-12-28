@@ -1,0 +1,47 @@
+	<h1>{{ widget.title }}</h1>
+
+    <p>Please fill out the following fields to login:</p>
+    
+    {% set form = t.getWidget('yii.bootstrap.ActiveForm') %}
+    {% set form = form.begin({
+        "id": "form-" ~ widget.id,
+        "layout": "horizontal",
+        'fieldConfig': {
+	        'template': "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+	        'labelOptions': {'class': 'col-lg-1 control-label'}
+	    }
+    }|merge(widget.formConfig)) %}
+{#
+    <?php $form = ActiveForm::begin([
+        'id' => 'login-form',
+        'layout' => 'horizontal',
+        'fieldConfig' => [
+            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+            'labelOptions' => ['class' => 'col-lg-1 control-label'],
+        ],
+    ]); ?>
+    #}
+
+		{{ t.renderWidget('mozzler.base.widgets.model.input.RenderField', {
+			'form': form,
+			'model': widget.model,
+			'attribute': widget.usernameField
+		}) }}
+		
+		{{ t.renderWidget('mozzler.base.widgets.model.input.RenderField', {
+			'form': form,
+			'model': widget.model,
+			'attribute': widget.passwordField
+		}) }}
+
+        <div class="form-group">
+            <div class="col-lg-offset-1 col-lg-11">
+            	{{ html.submitButton('Login', {'class': 'btn btn-primary', 'name': 'login-button'}) }}
+            </div>
+        </div>
+
+    {% set form = form.end() %}
+
+    <div class="col-lg-offset-1" style="color:#999;">
+        Forgot your password? <a href="{{ model.getUrl("requestPasswordReset") }}">Reset now</a>.
+    </div>
