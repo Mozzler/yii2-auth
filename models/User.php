@@ -47,13 +47,18 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		$fields['password'] = [
 			'type' => 'Password',
 			'label' => 'Password',
-			'required' => true,
+			'required' => ['create','signup'],
 			'save' => false
 		];
 		$fields['passwordHash'] = [
 			'type' => 'Text',
 			'label' => 'Password hash',
 			'required' => true
+		];
+		$fields['roles'] = [
+			'type' => 'MultiSelect',
+			'label' => 'Roles',
+			'options' => \Yii::$app->rbac->getRoleOptions()
 		];
 		
 		return $fields;
@@ -91,10 +96,11 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	public function scenarios()
     {
 	    $scenarios = parent::scenarios();
-		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'createdAt', 'createdUserId'];
+		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'roles', 'createdAt', 'createdUserId'];
 	    $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_CREATE] = ['firstName', 'lastName', 'email', 'password'];
-	    $scenarios[self::SCENARIO_UPDATE] = ['firstName', 'lastName', 'email', 'password'];
+	    $scenarios[self::SCENARIO_UPDATE] = ['firstName', 'lastName', 'email', 'password', 'roles'];
+	    $scenarios[self::SCENARIO_VIEW] = ['firstName', 'lastName', 'email', 'roles', 'createdAt', 'updatedAt'];
 	    $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
 	    
 	    return $scenarios;
