@@ -59,10 +59,34 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		return $fields;
 	}
 	
+	public static function rbac() {
+		return [
+			'registered' => [
+				'find' => [
+					'grant' => [
+						'class' => 'mozzler\rbac\policies\IsOwnerModelPolicy',
+						'ownerAttribute' => '_id'
+					]
+				],
+				'insert' => [
+					'grant' => false,
+				],
+				'update' => [
+					'grant' => [
+						'class' => 'mozzler\rbac\policies\IsOwnerModelPolicy',
+						'ownerAttribute' => '_id'
+					]
+				],
+				'delete' => [
+					'grant' => false
+				]
+			]
+		];
+	}
+	
 	public function scenarios()
     {
 	    $scenarios = parent::scenarios();
-//	    unset($scenarios[self::SCENARIO_CREATE]);
 		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'createdAt', 'createdUserId'];
 	    $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_CREATE] = ['firstName', 'lastName', 'email', 'password'];
@@ -104,6 +128,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     
     public static function findIdentity($id)
     {
+	    // Don't check permissions when finding an Identity
 	    return self::findOne($id, false);
     }
     
