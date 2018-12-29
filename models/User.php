@@ -74,8 +74,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 					'grant' => [
 						'class' => 'mozzler\rbac\policies\IsOwnerModelPolicy',
 						'ownerAttribute' => '_id'
-					],
-					'access' => true
+					]
 				],
 				'create' => [
 					'grant' => false,
