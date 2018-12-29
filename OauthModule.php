@@ -14,15 +14,15 @@ class OauthModule extends \filsh\yii2\oauth2server\Module
 		        'allow_implicit' => true
 		    ],
 		    'storageMap' => [
-		        'user_credentials'		=> 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'access_token'          => 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'authorization_code'    => 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'client_credentials'    => 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'client'                => 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'refresh_token'         => 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'public_key'            => 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'jwt_bearer'            => 'mozzler\base\yii\oauth\storage\MongoDB',
-		        'scope'                 => 'mozzler\base\yii\oauth\storage\MongoDB',
+		        'user_credentials'		=> 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'access_token'          => 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'authorization_code'    => 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'client_credentials'    => 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'client'                => 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'refresh_token'         => 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'public_key'            => 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'jwt_bearer'            => 'mozzler\auth\yii\oauth\storage\MongoDB',
+		        'scope'                 => 'mozzler\auth\yii\oauth\storage\MongoDB',
 		    ],
 		    'grantTypes' => [
 		        'user_credentials' => [
