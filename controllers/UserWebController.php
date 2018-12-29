@@ -20,6 +20,12 @@ class UserWebController extends ModelController {
 			'registered' => [
 				'create' => [
 					'grant' => false
+				],
+				'update' => [
+					'grant' => true
+				],
+				'delete' => [
+					'grant' => false
 				]
 			]
 		];

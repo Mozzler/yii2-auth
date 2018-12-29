@@ -59,6 +59,9 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		return $fields;
 	}
 	
+	/**
+	 * Allow registered users to find and update their own records, but not delete or create
+	 */
 	public static function rbac() {
 		return [
 			'registered' => [
@@ -66,7 +69,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 					'grant' => [
 						'class' => 'mozzler\rbac\policies\IsOwnerModelPolicy',
 						'ownerAttribute' => '_id'
-					]
+					],
+					'access' => true
 				],
 				'create' => [
 					'grant' => false,
@@ -90,6 +94,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'createdAt', 'createdUserId'];
 	    $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_CREATE] = ['firstName', 'lastName', 'email', 'password'];
+	    $scenarios[self::SCENARIO_UPDATE] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
 	    
 	    return $scenarios;
