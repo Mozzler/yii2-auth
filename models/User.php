@@ -68,7 +68,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 						'ownerAttribute' => '_id'
 					]
 				],
-				'insert' => [
+				'create' => [
 					'grant' => false,
 				],
 				'update' => [

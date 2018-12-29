@@ -14,6 +14,16 @@ class UserApiController extends ActiveController {
 	    parent::init();
 	    $this->module = \Yii::$app->getModule('oauth2');	    
     }
+    
+    public static function rbac() {
+		return [
+			'registered' => [
+				'create' => [
+					'grant' => false
+				]
+			]
+		];
+	}
 
     public function actionToken()
     {

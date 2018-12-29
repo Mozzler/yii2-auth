@@ -15,4 +15,14 @@ class UserWebController extends ModelController {
 		]);
 	}
 	
+	public static function rbac() {
+		return [
+			'registered' => [
+				'create' => [
+					'grant' => false
+				]
+			]
+		];
+	}
+	
 }
