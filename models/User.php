@@ -234,7 +234,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     }
     
     public function username() {
-	    $usernameField = self::$usernameField;
+	    $usernameField = static::$usernameField;
 	    return $this->$usernameField;
     }
     
