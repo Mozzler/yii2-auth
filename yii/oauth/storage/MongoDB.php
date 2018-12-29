@@ -365,7 +365,18 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
     // Helper function to access a MongoDB collection by `type`:
     protected function collection($name)
     {
+	    $this->ensureRbacDisabled($this->config[$name]);
+	    
         return $this->db->getCollection($this->config[$name]);
+    }
+    
+    /**
+	 * If RBAC is enabled, ignore all oauth related collections
+	 */
+    private function ensureRbacDisabled($collection) {
+	    if (isset(\Yii::$app->rbac)) {
+	    	\Yii::$app->rbac->ignoreCollection($collection);
+	    }
     }
     
     //for ScopeInterface
