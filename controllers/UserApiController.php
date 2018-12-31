@@ -39,8 +39,12 @@ class UserApiController extends ActiveController {
         
         if (isset($params['access_token'])) {
 		    // include the user_id in the access_token response
-		    $tokens = new OauthAccessToken();
-		    $params['user_id'] = $tokens->findUserId($params['access_token']);
+		    $user = \Yii::createObject($this->modelClass);
+		    $user = $user->findIdentityByAccessToken($params['access_token']);
+		    
+		    $params['user_id'] = $user->id;
+		    $usernameField = $user::$usernameField;
+		    $params['username'] = $user->$usernameField;
 	    }
 	    
 	    return $params;
