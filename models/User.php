@@ -124,11 +124,11 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     /**
 	 * Required for OAuth2 by `hosannahighertech/yii2-oauth2-server`
 	 */
-    public function getUserDetails($id)
+    public function getUserDetails($username)
     {
 	    $user = $this->findByUsername($username);
 	    $usernameField = $user::$usernameField;
-	    // TODO: Implement
+
 	    return [
 		    'user_id' => $user->$usernameField,	// MongoDB ID for the user
 		    'id' => $user->id,

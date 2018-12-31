@@ -34,7 +34,7 @@ class OauthModule extends \filsh\yii2\oauth2server\Module
 		        ]
 		    ]
 		];
-		
+
 		return parent::__construct($id, $parent, ArrayHelper::merge($defaultConfig, $config));
 	}
 	

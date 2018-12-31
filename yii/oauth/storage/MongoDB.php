@@ -208,8 +208,7 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
     {
 	    $details = [];
         if ($user = $this->getUser($username)) {
-	        $usernameField = $user::$usernameField;
-            $details['user_id'] = $user->$usernameField;
+	        return $user->getUserDetails($username);
         }
         return $details;
     }

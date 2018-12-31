@@ -9,6 +9,10 @@ class CompositeAuth extends \filsh\yii2\oauth2server\filters\auth\CompositeAuth
      */
     public function beforeAction($action)
     {
+	    // Create an instance of the user identity class to ensure it exists and maps
+	    // RBAC permissions
+	    \Yii::createObject(\Yii::$app->user->identityClass);
+	    
         $server = \Yii::$app->getModule('oauth2')->getServer();
         $server->verifyResourceRequest();
         
