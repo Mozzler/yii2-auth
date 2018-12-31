@@ -143,7 +143,12 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     }
     
     /**
-     * @see yii\web\IdentityInterface
+     * Finds user by username.
+     *
+     * Requires the creation of a `username` field on the model.
+     *
+     * @param  string      $username	Username to locate the user
+     * @return	User	Returns the User model matching the `$username`, otherwise returns null.
      */
     public static function findByUsername($id)
     {
@@ -167,19 +172,6 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         return self::findByUsername($token['user_id']);
     }
 	
-	/**
-     * Finds user by username.
-     *
-     * Requires the creation of a `username` field on the model.
-     *
-     * @param  string      $username	Username to locate the user
-     * @return	User	Returns the User model matching the `$username`, otherwise returns null.
-     */
-    /*public static function findByUsername($username)
-    {
-        return static::findOne(['username' => $username], false);
-    }*/
-    
     /**
      * Finds a user by password reset token.
      *
