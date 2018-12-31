@@ -105,7 +105,6 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
     public function getAccessToken($access_token)
     {
         $token = $this->collection('access_token_table')->findOne(array('access_token' => $access_token));
-        \Yii::trace(print_r($token,true));
         return is_null($token) ? false : $token;
     }
 
