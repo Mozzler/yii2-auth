@@ -19,9 +19,9 @@ class OauthAccessToken extends \yii\mongodb\ActiveRecord
     /**
      * @inheritdoc
      */
-    public static function tableName()
+    public static function collectionName()
     {
-        return '{{%oauth_access_tokens}}';
+        return 'mozzler.auth.access_tokens';
     }
     /**
      * @inheritdoc

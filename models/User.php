@@ -7,6 +7,7 @@ use Yii;
 use mozzler\base\models\Model;
 use mozzler\auth\models\behaviors\UserSetNameBehavior;
 use mozzler\auth\models\behaviors\UserSetPasswordHashBehavior;
+use mozzler\auth\models\oauth\OauthAccessToken;
 
 class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\UserCredentialsInterface {
 
@@ -159,17 +160,14 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        $retval = null;
-		$oauth2 = Yii::$app->getModule('oauth2');
-
-        $oauthServer = $oauth2->getServer();
-        $oauthRequest = $oauth2->getRequest();
-
-        $oauthServer->verifyResourceRequest($oauthRequest);
-
-        $token = $oauthServer->getAccessTokenData($oauthRequest);
-        
-        return self::findByUsername($token['user_id']);
+	    $OAuth = \Yii::createObject(OauthAccessToken::className());
+	    $token = $OAuth::findOne([
+		    'access_token' => $token
+	    ]);
+	    
+	    if ($token) {
+        	return self::findByUsername($token['user_id']);
+        }
     }
 	
     /**
