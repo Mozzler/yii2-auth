@@ -33,15 +33,15 @@ class UserApiController extends ActiveController {
 
     public function actionToken()
     {
-        /** @var $response \OAuth2\Response */
         $response = $this->module->getServer()->handleTokenRequest();
+		
         $params = $response->getParameters();
         
         if (isset($params['access_token'])) {
 		    // include the user_id in the access_token response
 		    $user = \Yii::createObject($this->modelClass);
 		    $user = $user->findIdentityByAccessToken($params['access_token']);
-		    
+
 		    $params['user_id'] = $user->id;
 		    $usernameField = $user::$usernameField;
 		    $params['username'] = $user->$usernameField;

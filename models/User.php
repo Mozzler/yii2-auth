@@ -48,7 +48,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		$fields['password'] = [
 			'type' => 'Password',
 			'label' => 'Password',
-			'required' => ['create','signup'],
+			'required' => ['create','signup','login'],
 			'save' => false
 		];
 		$fields['passwordHash'] = [
