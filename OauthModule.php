@@ -1,6 +1,8 @@
 <?php
 namespace mozzler\auth;
+
 use yii\helpers\ArrayHelper;
+use OAuth2\Request;
 
 class OauthModule extends \filsh\yii2\oauth2server\Module
 {	
@@ -37,5 +39,10 @@ class OauthModule extends \filsh\yii2\oauth2server\Module
 
 		return parent::__construct($id, $parent, ArrayHelper::merge($defaultConfig, $config));
 	}
+	
+	public function getRequest()
+    {
+	    return new Request(\Yii::$app->request->get(), \Yii::$app->request->post(), [], $_COOKIE, $_FILES, $_SERVER);
+    }
 	
 }
