@@ -6,8 +6,4 @@ use mozzler\base\MozzlerModule;
 class Module extends MozzlerModule
 {	
 	public static $viewPath = '@mozzler/auth/views';
-	
-	public function init() {
-		parent::init();
-	}
 }
