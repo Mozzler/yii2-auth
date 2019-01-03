@@ -14,8 +14,7 @@ class UserSetPasswordHashBehavior extends AttributeBehavior
     {
         parent::init();
         $this->attributes = [
-            BaseActiveRecord::EVENT_BEFORE_INSERT => 'passwordHash',
-            BaseActiveRecord::EVENT_BEFORE_UPDATE => 'passwordHash'
+            BaseActiveRecord::EVENT_AFTER_VALIDATE => 'passwordHash'
         ];
     }
 
@@ -24,6 +23,6 @@ class UserSetPasswordHashBehavior extends AttributeBehavior
     protected function getValue($event)
     {
         $model = $event->sender;
-		return \Yii::$app->getSecurity()->generatePasswordHash($model->password);
+        return \Yii::$app->getSecurity()->generatePasswordHash($model->password);
     }
 }
