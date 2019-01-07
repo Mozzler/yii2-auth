@@ -57,7 +57,8 @@ class OauthAccessToken extends \yii\mongodb\ActiveRecord
 		    'user_id',
 		    'expires',
 		    'scope',
-		    'client_id'
+		    'client_id',
+            '_id'
 	    ];
     }
     
