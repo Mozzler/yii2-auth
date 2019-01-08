@@ -35,7 +35,8 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
             'jwt_table' => 'mozzler.auth.jwt',
             'jti_table' => 'mozzler.auth.jti',
             'scope_table'  => 'mozzler.auth.scopes',
-            'key_table'  => 'mozzler.auth.keys'
+            'key_table'  => 'mozzler.auth.keys',
+            'refresh_token_no_expiry' => true
         ], $config);
     }
 
@@ -225,6 +226,10 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
 
     public function setRefreshToken($refresh_token, $client_id, $user_id, $expires, $scope = null)
     {
+        if ($this->config['refresh_token_no_expiry']) {
+            $expires = null;
+        }
+        
         $token = array(
             'refresh_token' => $refresh_token,
             'client_id' => $client_id,
