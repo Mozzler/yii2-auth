@@ -7,6 +7,8 @@ class Module extends MozzlerModule
 {	
 	public static $viewPath = '@mozzler/auth/views';
 	
+	public $identityClass = 'app\models\User';
+	
 	/**
      * Initial credentials for the first admin user in the application
      */

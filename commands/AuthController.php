@@ -32,13 +32,12 @@ class AuthController extends Controller
      */
     public function actionInitCredentials($username=null, $password=null)
     {
-        $credentials = ArrayHelper::merge(\Yii::$app->getModule('auth')->initialCredentials, [
-            'username' => $username,
-            'password' => $password
-        ]);
-        
-        
-        $userModel = \Yii::createObject(\Yii::$app->user->identityClass);
+        $auth = \Yii::$app->getModule('auth');
+        $credentials = $auth->initialCredentials;
+        $credentials['username'] = $username ? $username : $credentials['username'];
+        $credentials['password'] = $username ? $username : $credentials['password'];
+
+        $userModel = \Yii::createObject($auth->identityClass);
 
         if ($userModel->findByUsername($username)) {
             $this->stdout("User ($username) already exists, no need to create");
@@ -47,28 +46,25 @@ class AuthController extends Controller
             $username = $credentials['username'];
             unset($credentials['username']);
             $credentials[$userModel::$usernameField] = $username;
-            
+
             $userModel->load($credentials,"");
-            if (!$userModel->save()) {
-                $this->stdout("Unable to create initial user ($username)", Console::FG_RED);
-                $this->stdout(print_r($userModel->getErrors(),true));
+            try
+            {
+                if (!$userModel->save(true, null, false)) {
+                    $this->stdout("Unable to create initial user ($username)", Console::FG_RED."\n");
+                    $this->stdout(print_r($userModel->getErrors(),true));
+                }
             }
-        }
-        
-        
-        
-        // find all the models
-        $models = [
-            'app\models\Device'
-        ];
-        
-        $indexManager = \Yii::createObject('mozzler\base\components\IndexManager');
-        
-        foreach ($models as $className) {
-            $this->stdout('Processing model: '.$className."\n", Console::FG_GREEN);
+            catch (\yii\mongodb\Exception $e) {
+                $code = (int) $e->getCode();
+                if ($code == 11000) {
+                    $this->stdout("User already exists (".$credentials[$userModel::$usernameField].") - ignoring"."\n", Console::FG_YELLOW);
+                }
+                else {
+                    $this->stdout("Database error: ".$e->getMessage()."\n", Console::FG_RED);
+                }
+            }
             
-            $indexManager->syncModelIndexes($className);
-            $this->outputLogs($indexManager->logs);
         }
 
         return ExitCode::OK;

@@ -14,7 +14,7 @@ class UserSetPasswordHashBehavior extends AttributeBehavior
     {
         parent::init();
         $this->attributes = [
-            BaseActiveRecord::EVENT_AFTER_VALIDATE => 'passwordHash'
+            BaseActiveRecord::EVENT_BEFORE_VALIDATE => 'passwordHash'
         ];
     }
 
