@@ -17,6 +17,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	
 	const SCENARIO_SIGNUP = 'signup';
 	const SCENARIO_LOGIN = 'login';
+	const SCENARIO_REQUEST_PASSWORD_RESET = 'requestPasswordReset';
+	const SCENARIO_PASSWORD_RESET = 'passwordReset';
 	
 	protected function modelConfig()
 	{
@@ -61,6 +63,9 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			'label' => 'Roles',
 			'options' => \Yii::$app->rbac->getRoleOptions()
 		];
+		$fields['passwordResetToken'] = [
+    		'type' => 'Text'
+		];
 		
 		return $fields;
 	}
@@ -102,6 +107,9 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	    $scenarios[self::SCENARIO_UPDATE] = ['firstName', 'lastName', 'email', 'password', 'roles'];
 	    $scenarios[self::SCENARIO_VIEW] = ['firstName', 'lastName', 'email', 'roles', 'createdAt', 'updatedAt'];
 	    $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
+	    $scenarios[self::SCENARIO_SEARCH] = ['name', 'email', 'roles'];
+        $scenarios[self::SCENARIO_REQUEST_PASSWORD_RESET] = ['email'];
+        $scenarios[self::SCENARIO_PASSWORD_RESET] = ['email', 'passwordResetToken', 'password'];
 	    
 	    return $scenarios;
     }
@@ -168,6 +176,11 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	    if ($token) {
         	return self::findByUsername($token['user_id']);
         }
+    }
+    
+    public function generatePasswordResetToken()
+    {
+        $this->passwordResetToken = urlencode(utf8_encode(Yii::$app->getSecurity()->generateRandomKey() . '_' . time()));
     }
 	
     /**

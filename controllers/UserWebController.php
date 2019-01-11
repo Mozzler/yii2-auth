@@ -11,7 +11,9 @@ class UserWebController extends ModelController {
 	public function actions() {
 		return \yii\helpers\ArrayHelper::merge(parent::actions(), [
 			'login' => 'mozzler\auth\actions\UserLoginAction',
-			'logout' => 'mozzler\auth\actions\UserLogoutAction'
+			'logout' => 'mozzler\auth\actions\UserLogoutAction',
+			'requestPasswordReset' => 'mozzler\auth\actions\UserRequestPasswordReset',
+			'passwordReset' => 'mozzler\auth\actions\UserPasswordReset'
 		]);
 	}
 	
