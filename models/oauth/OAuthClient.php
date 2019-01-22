@@ -3,11 +3,12 @@ namespace mozzler\auth\models\oauth;
 
 use yii\helpers\ArrayHelper;
 
-class OAuthClientModel extends \mozzler\base\models\Model
+class OAuthClient extends \mozzler\base\models\Model
 {
 	
 	protected static $collectionName = 'mozzler.auth.clients';
-	
+	public $controllerRoute = 'auth/oauthclient';
+
 	protected function modelConfig() {
 		return [
 			'label' => 'OAuth Client',

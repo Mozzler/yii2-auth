@@ -1,7 +1,7 @@
 <?php
 namespace mozzler\auth\models\oauth;
 use Yii;
-use mozzler\auth\models\oauth\OAuthClientModel;
+use mozzler\auth\models\oauth\OAuthClient;
 
 /**
  * This is the model class for table "oauth_access_tokens".
@@ -74,7 +74,7 @@ class OauthAccessToken extends \yii\mongodb\ActiveRecord
 	 * Find the UserID for a given access token
 	 */
     public function findUserId($accessToken) {
-	    $clientModel = new OAuthClientModel();
+	    $clientModel = new OAuthClient();
 
 	    $client = $clientModel->findOne([
 		    'access_token' => $accessToken

@@ -3,7 +3,7 @@
 namespace mozzler\auth\models\oauth;
 
 use Yii;
-use mozzler\auth\models\oauth\OAuthClientModel;
+use mozzler\auth\models\oauth\OAuthClient;
 
 /**
  * This is the model class for table "oauth_refresh_tokens".
@@ -80,7 +80,7 @@ class OauthRefreshToken extends \yii\mongodb\ActiveRecord
      */
     public function findUserId($refreshToken)
     {
-        $clientModel = new OAuthClientModel();
+        $clientModel = new OAuthClient();
 
         $client = $clientModel->findOne([
             'refresh_token' => $refreshToken

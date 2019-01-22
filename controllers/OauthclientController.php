@@ -6,6 +6,6 @@ use mozzler\base\controllers\ModelController;
 class OauthclientController extends ModelController
 {
 	
-	public $modelClass = 'mozzler\auth\models\oauth\OAuthClientModel';
+	public $modelClass = 'mozzler\auth\models\oauth\OAuthClient';
 	
 }
