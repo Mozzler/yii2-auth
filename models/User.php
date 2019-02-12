@@ -58,6 +58,17 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			'label' => 'Password hash',
 			'required' => true
 		];
+		$fields['status'] = [
+			'type' => 'SingleSelect',
+			'label' => 'Status',
+			'default' => 'active',
+			'options' => [
+				'active' => 'Active', 
+				'archived' => 'Archived',
+				'pending' => 'Pending'
+			],
+			'required' => true
+		];
 		$fields['roles'] = [
 			'type' => 'MultiSelect',
 			'label' => 'Roles',
@@ -101,13 +112,13 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	public function scenarios()
     {
 	    $scenarios = parent::scenarios();
-		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'roles', 'createdAt', 'createdUserId'];
+		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'roles', 'status', 'createdAt', 'createdUserId'];
 	    $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_CREATE] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_UPDATE] = ['firstName', 'lastName', 'email', 'password', 'roles'];
 	    $scenarios[self::SCENARIO_VIEW] = ['firstName', 'lastName', 'email', 'roles', 'createdAt', 'updatedAt'];
 	    $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
-	    $scenarios[self::SCENARIO_SEARCH] = ['name', 'email', 'roles'];
+	    $scenarios[self::SCENARIO_SEARCH] = ['name', 'email', 'roles', 'status'];
         $scenarios[self::SCENARIO_REQUEST_PASSWORD_RESET] = ['email'];
         $scenarios[self::SCENARIO_PASSWORD_RESET] = ['email', 'passwordResetToken', 'password'];
 	    
