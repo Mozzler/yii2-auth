@@ -23,6 +23,11 @@ class UserSetPasswordHashBehavior extends AttributeBehavior
     protected function getValue($event)
     {
         $model = $event->sender;
-        return \Yii::$app->getSecurity()->generatePasswordHash($model->password);
+
+        if ($model->password) {
+            return \Yii::$app->getSecurity()->generatePasswordHash($model->password);
+        } else {
+            return $model->passwordHash;
+        }
     }
 }
