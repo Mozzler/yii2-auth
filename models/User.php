@@ -22,10 +22,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	
 	protected function modelConfig()
 	{
-		return [
+		return ArrayHelper::merge(parent::modelConfig(), [
 			'label' => 'User',
 			'labelPlural' => 'Users'
-		];
+		]);
 	}
 	
 	protected function modelFields()
