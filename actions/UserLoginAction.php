@@ -10,14 +10,14 @@ class UserLoginAction extends \mozzler\base\actions\BaseModelAction {
 
 	public function run() {
 		if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            return $this->controller->goHome();
         }
 
         $model = \Yii::createObject(\Yii::$app->user->identityClass);
         $model->setScenario($model::SCENARIO_LOGIN);
 
         if ($model->load(Yii::$app->request->post()) && $this->login($model)) {
-            return $this->controller->goBack();
+            return $this->controller->goHome();
         }
 
         $model->password = '';
