@@ -111,11 +111,20 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	
 	public function scenarios()
     {
-	    $scenarios = parent::scenarios();
+		$user = \Yii::$app->user->getIdentity();
+
+        $adminUpdatePermittedFields = [];
+
+        // check if user is logged in, has user->roles, and if admin
+        if ($user && $user->roles && ArrayHelper::isIn('admin', $user->roles)) {
+			$adminUpdatePermittedFields = ['roles', 'status'];
+		}
+
+		$scenarios = parent::scenarios();
 		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'roles', 'status', 'createdAt', 'createdUserId'];
 	    $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
 	    $scenarios[self::SCENARIO_CREATE] = ['firstName', 'lastName', 'email', 'password'];
-	    $scenarios[self::SCENARIO_UPDATE] = ['firstName', 'lastName', 'email', 'password', 'roles'];
+	    $scenarios[self::SCENARIO_UPDATE] = ArrayHelper::merge(['firstName', 'lastName', 'email', 'password'], $adminUpdatePermittedFields);
 	    $scenarios[self::SCENARIO_VIEW] = ['firstName', 'lastName', 'email', 'roles', 'createdAt', 'updatedAt'];
 	    $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
 	    $scenarios[self::SCENARIO_SEARCH] = ['name', 'email', 'roles', 'status'];
