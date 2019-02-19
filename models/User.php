@@ -121,13 +121,13 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		}
 
 		$scenarios = parent::scenarios();
-		$scenarios[self::SCENARIO_LIST] = ['name', 'email', 'roles', 'status', 'createdAt', 'createdUserId'];
-	    $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
-	    $scenarios[self::SCENARIO_CREATE] = ['firstName', 'lastName', 'email', 'password'];
-	    $scenarios[self::SCENARIO_UPDATE] = ArrayHelper::merge(['firstName', 'lastName', 'email', 'password'], $adminUpdatePermittedFields);
-	    $scenarios[self::SCENARIO_VIEW] = ['firstName', 'lastName', 'email', 'roles', 'createdAt', 'updatedAt'];
-	    $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
-	    $scenarios[self::SCENARIO_SEARCH] = ['name', 'email', 'roles', 'status'];
+		$scenarios[self::SCENARIO_LIST] 	= ArrayHelper::merge(['name', 'email'], $adminUpdatePermittedFields, ['createdAt', 'createdUserId']);
+	    $scenarios[self::SCENARIO_SIGNUP] 	= ['firstName', 'lastName', 'email', 'password'];
+	    $scenarios[self::SCENARIO_CREATE] 	= ArrayHelper::merge(['firstName', 'lastName', 'email', 'password'], $adminUpdatePermittedFields);
+	    $scenarios[self::SCENARIO_UPDATE] 	= ArrayHelper::merge(['firstName', 'lastName', 'email', 'password'], $adminUpdatePermittedFields);
+		$scenarios[self::SCENARIO_VIEW] 	= ArrayHelper::merge(['firstName', 'lastName', 'email', 'password'], $adminUpdatePermittedFields, ['createdAt', 'updatedAt']);
+	    $scenarios[self::SCENARIO_LOGIN] 	= ['email', 'password'];
+	    $scenarios[self::SCENARIO_SEARCH] 	= ArrayHelper::merge(['name', 'email'], $adminUpdatePermittedFields);
         $scenarios[self::SCENARIO_REQUEST_PASSWORD_RESET] = ['email'];
         $scenarios[self::SCENARIO_PASSWORD_RESET] = ['email', 'passwordResetToken', 'password'];
 	    
