@@ -19,6 +19,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	const SCENARIO_LOGIN = 'login';
 	const SCENARIO_REQUEST_PASSWORD_RESET = 'requestPasswordReset';
 	const SCENARIO_PASSWORD_RESET = 'passwordReset';
+
+	const STATUS_ACTIVE = 'active';
+	const STATUS_ARCHIVED = 'archived';
+	const STATUS_PENDING = 'pending';
 	
 	protected function modelConfig()
 	{
@@ -200,9 +204,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
      * @param  string		$token	Password reset token
      * @return Model		Returns `null` if the user was not found or their token is expired
      */
-    /*public static function findByPasswordResetToken($token)
+    public static function findByPasswordResetToken($token)
     {
-        $expire = Dpi\Base::app()->getConfig('rappsio.auth.passwordResetTokenExpire');
+		$config = \Yii::$app->params['mozzler.auth']['user']['passwordReset'];
+        $expire = $config['tokenExpiry'];
         $parts = explode('_', $token);
         $timestamp = (int) end($parts);
         if ($timestamp + $expire < time()) {
@@ -211,10 +216,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         }
 
         return static::findOne([
-            'password_reset_token' => $token,
-            //'status' => self::STATUS_ACTIVE,
+            'passwordResetToken' => $token,
+            'status' => self::STATUS_ACTIVE,
         ], false);
-    }*/
+    }
 
     /**
      * Add support for Rappsio internals.
