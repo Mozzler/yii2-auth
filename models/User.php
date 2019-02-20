@@ -79,7 +79,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			'options' => \Yii::$app->rbac->getRoleOptions()
 		];
 		$fields['passwordResetToken'] = [
-    		'type' => 'Text'
+			'type' => 'Text',
+			'hidden' => true
 		];
 		
 		return $fields;

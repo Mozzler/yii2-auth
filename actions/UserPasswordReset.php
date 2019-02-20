@@ -16,49 +16,45 @@ class UserPasswordReset extends \mozzler\base\actions\BaseModelAction {
 
 	public function run() {
 		if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            return $this->controller->goHome();
         }
 
         $model = \Yii::createObject(\Yii::$app->user->identityClass);
         $model->setScenario($model::SCENARIO_PASSWORD_RESET);
+        $model->passwordResetToken = \Yii::$app->request->get('token');
+
+        $config = \Yii::$app->params['mozzler.auth']['user']['passwordReset'];
 
         if ($model->load(Yii::$app->request->post())) {
-            $this->requestPasswordReset($model);
+            $user = $model->findByPasswordResetToken($model->passwordResetToken);
+            
+            if ($user) {
+                // check email matches
+                if ($user->email != $model->email) {
+                    $model->addError('email', $config['emailMismatch']);
+                }
+                else {
+                    $user->setScenario($model::SCENARIO_PASSWORD_RESET);
+                    $user->password = $model->password;
+                    $user->passwordResetToken = null;
+
+                    if ($user->save(true, null, false)) {
+                        \Yii::info("Password reset for user {$user->email}", __METHOD__);
+                        \Yii::$app->session->setFlash('info', $config['successMessage']);
+                        return $this->controller->redirect($config['redirectUrl']);
+                    } else {
+                        \Yii::error("Password reset failed for user {$user->email}", __METHOD__);
+                    }
+                }
+            } else {
+                \Yii::$app->session->setFlash('error', $config['invalidToken']);
+                $model->addError(null, $config['invalidToken']);
+                \Yii::info("Invalid token supplied for {$model->email}", __METHOD__);
+            }
         }
 
         $this->controller->data['model'] = $model;
-
 		return parent::run();
-	}
-
-	protected function requestPasswordReset($model) {
-		$usernameField = $model::$usernameField;
-		$user = $model::findByUsername($model->$usernameField);
-
-		// -- Invalid user
-		if (empty($user))
-		{
-            Yii::$app->session->setFlash('error', "Invalid Username or Password");
-		    return false;
-        }
-        
-        // generate password reset token
-        $user->generatePasswordResetToken();
-        // saving the user, running validation, but also disabling permission checks
-        if (!$user->save(true, null, false))
-        {
-            Yii::$app->session->setFlash('error', "Unable to generate reset token at this time");
-            return false;
-        }
-        
-        // send reset email
-        $appName = \Yii::$app->name;
-        $subject = $appName . ": Reset Password";
-        // TODO
-        //\Yii::$app->t->sendEmail($user->email, $subject, "emails/passwordReset.twig", ["model" => user]);
-
-        \Yii::$app->session->setFlash('info', "Reset password request sent to ".$user->email);
-		return true;
-	}
+    }
 
 }

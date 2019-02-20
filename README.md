@@ -23,6 +23,22 @@ When making a request to fetch a `token` you must supply a valid `username` and 
 
 Note: Custom table names are not yet supported.
 
+Add the following configuration to `config/params.php`:
+
+```
+'mozzler.auth' => [
+      'user' => [
+          'passwordReset' => [
+              "invalidToken" => "Your link to reset password has expired",
+              "emailMismatch" => "Email address does not match token",
+              "successMessage" => "Password successfully reset, please login",
+              'redirectUrl' => '/user/login',
+              'tokenExpiry' => 60*60,        // 1 hour
+          ]
+      ]
+  ]
+```
+
 ## Create client application
 
 In order to use OAuth it must be configured with a client application. This is a `client-id` and `client-secret` that is sent to the server by the application using the API. This enables the server to identify the connecting application and remove it's access if required.

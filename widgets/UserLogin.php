@@ -25,13 +25,6 @@ class UserLogin extends BaseWidget {
 		];
 	}
 	
-	/*
-	public function config($templatify=false) {
-		$config = parent::config($templatify);
-		
-		return $config;
-	}*/
-	
 }
 
 ?>

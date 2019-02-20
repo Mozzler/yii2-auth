@@ -17,7 +17,7 @@ class UserRequestPasswordReset extends \mozzler\base\actions\BaseModelAction {
 	public function run() {
     	
 		if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            return $this->controller->goHome();
         }
 
         $model = \Yii::createObject(\Yii::$app->user->identityClass);
@@ -55,11 +55,15 @@ class UserRequestPasswordReset extends \mozzler\base\actions\BaseModelAction {
         // send reset email
         $appName = \Yii::$app->name;
         $subject = $appName . ": Reset Password";
-        // TODO
-        //\Yii::$app->t->sendEmail($user->email, $subject, "emails/passwordReset.twig", ["model" => user]);
 
-        \Yii::$app->session->setFlash('info', "Reset password request sent to ".$user->email);
-		return true;
+        $response = \Yii::$app->t->sendEmail($user->email, $subject, "user/passwordReset.twig", ["user" => $user]);
+
+        if ($response) {
+            \Yii::$app->session->setFlash('info', "Reset password request sent to ".$user->email);
+            return true;
+        }
+
+        throw new \Exception('Unknown error occurred sending password reset email');
 	}
 
 }
