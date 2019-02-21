@@ -65,7 +65,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		$fields['status'] = [
 			'type' => 'SingleSelect',
 			'label' => 'Status',
-			'default' => 'active',
+			'default' => self::STATUS_ACTIVE,
 			'options' => [
 				'active' => 'Active', 
 				'archived' => 'Archived',
