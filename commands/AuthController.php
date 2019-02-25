@@ -27,6 +27,7 @@ class AuthController extends Controller
      */
     public function actionInitCredentials($username = null, $password = null)
     {
+
         $auth = \Yii::$app->getModule('auth');
         $credentials = $auth->initialCredentials;
         $credentials['username'] = $username ? $username : $credentials['username'];
@@ -45,7 +46,7 @@ class AuthController extends Controller
             try {
                 if (!$userModel->save(true, null, false)) {
                     $this->stdout("Unable to create initial user ($username)", Console::FG_RED . "\n");
-                    $this->stdout(print_r($userModel->getErrors(), true));
+                    $this->stdout("Model save errors:\n" . print_r($userModel->getErrors(), true));
                 }
             } catch (\yii\mongodb\Exception $e) {
                 $code = (int)$e->getCode();
