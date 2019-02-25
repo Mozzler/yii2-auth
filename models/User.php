@@ -116,7 +116,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	
 	public function scenarios()
     {
-		$user = \Yii::$app->user->getIdentity();
+		$user = null;
+		if (\Yii::$app->has('user')) {
+			$user = \Yii::$app->user->getIdentity();
+		}
 
         $adminUpdatePermittedFields = [];
 
