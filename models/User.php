@@ -60,7 +60,12 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		$fields['passwordHash'] = [
 			'type' => 'Text',
 			'label' => 'Password hash',
-			'required' => true
+			'required' => true,
+			'rules' => [
+				'string' => [
+					'max' => '100'
+				]
+			]
 		];
 		$fields['status'] = [
 			'type' => 'SingleSelect',
