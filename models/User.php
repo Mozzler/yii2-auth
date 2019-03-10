@@ -8,6 +8,7 @@ use mozzler\base\models\Model;
 use mozzler\auth\models\behaviors\UserSetNameBehavior;
 use mozzler\auth\models\behaviors\UserSetPasswordHashBehavior;
 use mozzler\auth\models\oauth\OauthAccessToken;
+use yii\helpers\ReplaceArrayValue;
 
 class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\UserCredentialsInterface {
 
@@ -78,10 +79,18 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			],
 			'required' => true
 		];
+
+		$validationRoles = new ReplaceArrayValue(array_keys(\Yii::$app->rbac->getRoleOptions(true)));
+
 		$fields['roles'] = [
 			'type' => 'MultiSelect',
 			'label' => 'Roles',
-			'options' => \Yii::$app->rbac->getRoleOptions()
+			'options' => \Yii::$app->rbac->getRoleOptions(false),
+			'rules' => [
+				'in' => [
+					'range' => $validationRoles,
+				]
+			]
 		];
 		$fields['passwordResetToken'] = [
 			'type' => 'Text',
