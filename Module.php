@@ -16,7 +16,8 @@ class Module extends MozzlerModule
     	'firstName' => 'Initial',
     	'lastName' => 'Admin',
     	'username' => 'admin@yourdomain.com',
-    	'password' => 'helloworld',
+		'password' => 'helloworld',
+		'status' => 'active',
     	'roles' => ['registered','admin']
 	];
 }
