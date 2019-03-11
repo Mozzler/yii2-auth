@@ -32,6 +32,20 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			'labelPlural' => 'Users'
 		]);
 	}
+
+	public function modelIndexes() {
+		return ArrayHelper::merge(parent::modelIndexes(), [
+			'uniqueUsername' => [
+				'columns' => [
+					static::$usernameField => 1
+				],
+				'options' => [
+					'unique' => true
+				],
+				'message' => [ucfirst(static::$usernameField).' already exists']
+			]
+		]);
+	}
 	
 	protected function modelFields()
 	{
