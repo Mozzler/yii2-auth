@@ -20,4 +20,5 @@ class Module extends MozzlerModule
 		'status' => 'active',
     	'roles' => ['registered','admin']
 	];
+
 }

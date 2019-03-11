@@ -19,6 +19,10 @@ use yii\helpers\ArrayHelper;
  */
 class AuthController extends Controller
 {
+
+    const EVENT_BEFORE_INIT_CREDENTIALS = 'beforeInitCredentials';
+    const EVENT_AFTER_INIT_CREDENTIALS = 'afterInitCredentials';
+
     /**
      * Creates a new 'mozzler.auth.user' with the roles of 'registered' and 'admin' based on the email and password
      * The $username is actually the email address e.g 'user@mozzler.com.au'
@@ -27,16 +31,25 @@ class AuthController extends Controller
      */
     public function actionInitCredentials($username = null, $password = null)
     {
-
         $auth = \Yii::$app->getModule('auth');
         $credentials = $auth->initialCredentials;
         $credentials['username'] = $username ? $username : $credentials['username'];
         $credentials['password'] = $password ? $password : $credentials['password'];
 
+        $event = new BeforeInitCredentialsEvent;
+        $event->credentials = $credentials;
+        $this->trigger(self::EVENT_BEFORE_INIT_CREDENTIALS, $event);
+        $credentials = $event->credentials;
+
         $userModel = \Yii::createObject($auth->identityClass);
+
+        $created = false;
+        $existed = false;
 
         if ($userModel->findByUsername($username)) {
             $this->stdout("User ($username) already exists, no need to create");
+            $existed = true;
+            $created = false;
         } else {
             $username = $credentials['username'];
             unset($credentials['username']);
@@ -47,6 +60,8 @@ class AuthController extends Controller
                 if (!$userModel->save(true, null, false)) {
                     $this->stdout("Unable to create initial user ($username)", Console::FG_RED . "\n");
                     $this->stdout("Model save errors:\n" . print_r($userModel->getErrors(), true));
+                } else {
+                    $created = true;
                 }
             } catch (\yii\mongodb\Exception $e) {
                 $code = (int)$e->getCode();
@@ -58,6 +73,11 @@ class AuthController extends Controller
             }
 
         }
+
+        $event = new AfterInitCredentialsEvent();
+        $event->created = $created;
+        $event->existed = $existed;
+        $this->trigger(self::EVENT_AFTER_INIT_CREDENTIALS, $event);
 
         return ExitCode::OK;
     }
