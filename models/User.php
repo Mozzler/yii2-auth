@@ -119,6 +119,11 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	 */
 	public static function rbac() {
 		return [
+			'admin' => [
+                'delete' => [
+                    'grant' => false
+                ]
+            ],
 			'registered' => [
 				'find' => [
 					'grant' => [
