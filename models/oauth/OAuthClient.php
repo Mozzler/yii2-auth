@@ -1,6 +1,7 @@
 <?php
 namespace mozzler\auth\models\oauth;
 
+use mozzler\base\models\behaviors\AuditLogBehaviour;
 use yii\helpers\ArrayHelper;
 
 class OAuthClient extends \mozzler\base\models\Model
@@ -41,6 +42,17 @@ class OAuthClient extends \mozzler\base\models\Model
             self::SCENARIO_EXPORT => ['_id', 'client_id', 'client_secret', 'createdAt', 'createdUserId', 'updatedAt', 'updatedUserId'],
             self::SCENARIO_DEFAULT => array_keys($this->modelFields())
         ];
+    }
+
+
+    public function behaviors() {
+        return ArrayHelper::merge(parent::behaviors(), [
+            [
+                'class' => AuditLogBehaviour::class,
+                'auditLogAttributes' => $this->auditLogAttributes(),
+                'skipUpdateOnClean' => true,
+            ]
+        ]);
     }
 	
 }
