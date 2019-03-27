@@ -149,15 +149,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	
 	public function scenarios()
     {
-		$user = null;
-		if (\Yii::$app->has('user')) {
-			$user = \Yii::$app->user->getIdentity();
-		}
-
-        $adminUpdatePermittedFields = [];
+		$adminUpdatePermittedFields = [];
 
         // check if user is logged in, has user->roles, and if admin
-        if ($user && \Yii::$app->rbac->canAccessCollection($this::$collectionName, 'insert')) {
+        if ($this->canUpdateAdminFields()) {
 			$adminUpdatePermittedFields = ['roles', 'status'];
 		}
 
@@ -173,7 +168,29 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         $scenarios[self::SCENARIO_PASSWORD_RESET] = ['email', 'passwordResetToken', 'password'];
 	    
 	    return $scenarios;
-    }
+	}
+	
+	/**
+	 * Determine if the current user can update admin fields (roles, status)
+	 */
+	protected function canUpdateAdminFields()
+	{
+		$user = null;
+		if (!\Yii::$app->has('user')) {
+			return false;
+		}
+
+		$user = \Yii::$app->user->getIdentity();
+
+        $adminUpdatePermittedFields = [];
+
+        // check if user is logged in, has user->roles, and if admin
+        if ($user && \Yii::$app->rbac->canAccessCollection($this::$collectionName, 'insert')) {
+			return true;
+		}
+
+		return false;
+	}
     
     public function behaviors() {
 	    return ArrayHelper::merge(parent::behaviors(), [
