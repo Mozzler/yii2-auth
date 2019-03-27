@@ -58,4 +58,23 @@ class OAuthClient extends \mozzler\base\models\Model
         ]);
     }
 
+    public static function rbac() {
+        return ArrayHelper::merge(parent::rbac(), [
+            'registered' => [
+                'find' => [
+                    'grant' => false
+                ],
+                'insert' => [
+                    'grant' => false
+                ],
+                'update' => [
+                    'grant' => false
+                ],
+                'delete' => [
+                    'grant' => false
+                ]
+            ]
+        ]);
+    }
+
 }
