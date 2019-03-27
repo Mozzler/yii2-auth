@@ -157,7 +157,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         $adminUpdatePermittedFields = [];
 
         // check if user is logged in, has user->roles, and if admin
-        if ($user && $user->roles && ArrayHelper::isIn('admin', $user->roles)) {
+        if ($user && \Yii::$app->rbac->canAccessCollection($this::$collectionName, 'insert')) {
 			$adminUpdatePermittedFields = ['roles', 'status'];
 		}
 
