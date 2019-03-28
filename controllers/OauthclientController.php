@@ -29,14 +29,20 @@ class OauthclientController extends ModelController
                 ]
             ],
             'admin' => [
+                'index' => [
+                    'grant' => true
+                ],
+                'view' => [
+                    'grant' => true
+                ],
                 'create' => [
-                    'grant' => false
+                    'grant' => true
                 ],
                 'update' => [
-                    'grant' => false
+                    'grant' => true
                 ],
                 'delete' => [
-                    'grant' => false
+                    'grant' => true
                 ]
             ]
         ]);

@@ -46,19 +46,8 @@ class OAuthClient extends \mozzler\base\models\Model
         ]);
     }
 
-
-    public function behaviors()
+    public static function rbac()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-            [
-                'class' => AuditLogBehaviour::class,
-                'auditLogAttributes' => $this->scenarios()[self::SCENARIO_AUDITABLE],
-                'skipUpdateOnClean' => true,
-            ]
-        ]);
-    }
-
-    public static function rbac() {
         return ArrayHelper::merge(parent::rbac(), [
             'registered' => [
                 'find' => [
