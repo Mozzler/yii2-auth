@@ -12,10 +12,10 @@ use yii\helpers\ReplaceArrayValue;
 
 class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\UserCredentialsInterface {
 
-	public static $moduleClass = '\mozzler\auth\Module';	
+	public static $moduleClass = '\mozzler\auth\Module';
 	protected static $collectionName = "mozzler.auth.user";
 	public static $usernameField = 'email';
-	
+
 	const SCENARIO_SIGNUP = 'signup';
 	const SCENARIO_LOGIN = 'login';
 	const SCENARIO_REQUEST_PASSWORD_RESET = 'requestPasswordReset';
@@ -24,7 +24,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	const STATUS_ACTIVE = 'active';
 	const STATUS_ARCHIVED = 'archived';
 	const STATUS_PENDING = 'pending';
-	
+
 	protected function modelConfig()
 	{
 		return ArrayHelper::merge(parent::modelConfig(), [
@@ -46,15 +46,19 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			]
 		]);
 	}
-	
+
 	protected function modelFields()
 	{
 		$fields = parent::modelFields();
-		
+
 		$fields['email'] = [
 			'type' => 'Email',
 			'label' => 'Email',
-			'required' => true
+			'required' => true,
+            'rules' => [
+                // -- Lowercase the email addresses to remove the need for string insensitive searches
+                'filter' => function($email) {return strtolower($email);}
+            ]
 		];
 		$fields['firstName'] = [
 			'type' => 'Text',
@@ -87,7 +91,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			'label' => 'Status',
 			'default' => self::STATUS_ACTIVE,
 			'options' => [
-				'active' => 'Active', 
+				'active' => 'Active',
 				'archived' => 'Archived',
 				'pending' => 'Pending'
 			],
@@ -110,10 +114,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			'type' => 'Text',
 			'hidden' => true
 		];
-		
+
 		return $fields;
 	}
-	
+
 	/**
 	 * Allow registered users to find and update their own records, but not delete or create
 	 */
@@ -146,7 +150,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 			]
 		];
 	}
-	
+
 	public function scenarios()
     {
 		$adminUpdatePermittedFields = [];
@@ -166,10 +170,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	    $scenarios[self::SCENARIO_SEARCH] 	= ArrayHelper::merge(['name', 'email'], $adminUpdatePermittedFields);
         $scenarios[self::SCENARIO_REQUEST_PASSWORD_RESET] = ['email'];
         $scenarios[self::SCENARIO_PASSWORD_RESET] = ['email', 'passwordResetToken', 'password'];
-	    
+
 	    return $scenarios;
 	}
-	
+
 	/**
 	 * Determine if the current user can update admin fields (roles, status)
 	 */
@@ -191,14 +195,14 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 
 		return false;
 	}
-    
+
     public function behaviors() {
 	    return ArrayHelper::merge(parent::behaviors(), [
 		    'UserSetNameBehavior' => UserSetNameBehavior::className(),
 		    'UserSetPasswordHash' => UserSetPasswordHashBehavior::className()
 	    ]);
     }
-    
+
     /**
 	 * Required for OAuth2 by `hosannahighertech/yii2-oauth2-server`
 	 */
@@ -207,7 +211,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 	    $user = $this->findByUsername($username);
 	    return $this->validatePassword($password);
     }
-    
+
     /**
 	 * Required for OAuth2 by `hosannahighertech/yii2-oauth2-server`
 	 */
@@ -222,13 +226,13 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 		    'scope' => ''		// optional space separated list of scopes
 	    ];
     }
-    
+
     public static function findIdentity($id)
     {
 	    // Don't check permissions when finding an Identity
 	    return self::findOne($id, false);
     }
-    
+
     /**
      * Finds user by username.
      *
@@ -239,28 +243,29 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
      */
     public static function findByUsername($id)
     {
+        $id = strtolower($id); // Always compare lowercase so there's no case sensitivity
 	    $filter = [];
 	    $filter[static::$usernameField] = $id;
         return static::findOne($filter, false);
     }
-    
+
     public static function findIdentityByAccessToken($token, $type = null)
     {
 	    $OAuth = \Yii::createObject(OauthAccessToken::className());
 	    $token = $OAuth::findOne([
 		    'access_token' => $token
 	    ]);
-	    
+
 	    if ($token) {
         	return self::findByUsername($token['user_id']);
         }
     }
-    
+
     public function generatePasswordResetToken()
     {
         $this->passwordResetToken = urlencode(utf8_encode(Yii::$app->getSecurity()->generateRandomKey() . '_' . time()));
     }
-	
+
     /**
      * Finds a user by password reset token.
      *
@@ -303,7 +308,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     {
         return $this->getAuthKey() === $authKey;
     }
-    
+
     /**
      * Validate a password.
      *
@@ -314,10 +319,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     {
 	    return Yii::$app->getSecurity()->validatePassword($password, $this->passwordHash);
     }
-    
+
     public function username() {
 	    $usernameField = static::$usernameField;
 	    return $this->$usernameField;
     }
-    
+
 }
