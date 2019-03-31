@@ -24,11 +24,21 @@ class OAuthClient extends \mozzler\base\models\Model
         return ArrayHelper::merge(parent::modelFields(), [
             'client_id' => [
                 'type' => 'Text',
-                'label' => 'Client ID'
+                'label' => 'Client ID',
+                'widgets' => [
+                    'view' => [
+                        'class' => 'mozzler\base\widgets\model\view\CodeField',
+                    ]
+                ]
             ],
             'client_secret' => [
                 'type' => 'Text',
-                'label' => 'Secret'
+                'label' => 'Secret',
+                'widgets' => [
+                    'view' => [
+                        'class' => 'mozzler\base\widgets\model\view\CodeField',
+                    ]
+                ]
             ]
         ]);
     }
