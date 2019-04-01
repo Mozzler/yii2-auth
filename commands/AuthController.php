@@ -5,7 +5,7 @@
 namespace mozzler\auth\commands;
 
 use Yii;
-use yii\console\Controller;
+use mozzler\base\commands\BaseController;
 use yii\helpers\Console;
 use yii\console\ExitCode;
 use yii\helpers\ArrayHelper;
@@ -17,7 +17,7 @@ use yii\helpers\ArrayHelper;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class AuthController extends Controller
+class AuthController extends BaseController
 {
 
     const EVENT_BEFORE_INIT_CREDENTIALS = 'beforeInitCredentials';
