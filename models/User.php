@@ -243,7 +243,6 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
      */
     public static function findByUsername($id)
     {
-        $id = strtolower($id); // Always compare lowercase so there's no case sensitivity
 	    $filter = [];
 	    $filter[static::$usernameField] = $id;
         return static::findOne($filter, false);
