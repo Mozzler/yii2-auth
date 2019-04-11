@@ -135,7 +135,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 						'ownerAttribute' => '_id'
 					]
 				],
-				'create' => [
+				'insert' => [
 					'grant' => false,
 				],
 				'update' => [
