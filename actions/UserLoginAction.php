@@ -29,7 +29,8 @@ class UserLoginAction extends \mozzler\base\actions\BaseModelAction {
 
 	protected function login($model) {
 		$usernameField = $model::$usernameField;
-		$user = $model::findByUsername($model->$usernameField);
+		// NB: We force the email address to be lowercase on login
+		$user = $model::findByUsername(strtolower($model->$usernameField));
 
 		// -- Invalid user
 		if (empty($user)) {
