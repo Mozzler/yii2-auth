@@ -1,15 +1,19 @@
 <?php
+
 namespace mozzler\auth\actions;
 
+use mozzler\auth\models\User;
 use Yii;
 use yii\web\ViewAction;
 
-class UserLoginAction extends \mozzler\base\actions\BaseModelAction {
+class UserLoginAction extends \mozzler\base\actions\BaseModelAction
+{
 
-	public $id = 'login';
+    public $id = 'login';
 
-	public function run() {
-		if (!Yii::$app->user->isGuest) {
+    public function run()
+    {
+        if (!Yii::$app->user->isGuest) {
             return $this->controller->goHome();
         }
 
@@ -24,29 +28,37 @@ class UserLoginAction extends \mozzler\base\actions\BaseModelAction {
 
         $this->controller->data['model'] = $model;
 
-		return parent::run();
-	}
+        return parent::run();
+    }
 
-	protected function login($model) {
-		$usernameField = $model::$usernameField;
-		// NB: We force the email address to be lowercase on login
-		$user = $model::findByUsername(strtolower($model->$usernameField));
+    protected function login($model)
+    {
+        $usernameField = $model::$usernameField;
+        // NB: We force the email address to be lowercase on login
+        $user = $model::findByUsername(strtolower($model->$usernameField));
 
-		// -- Invalid user
-		if (empty($user)) {
+        // -- Invalid user
+        if (empty($user)) {
             Yii::$app->session->setFlash('error', "Invalid Username or Password");
-		    return false;
+            return false;
         }
 
-		$valid = $user->validatePassword($model->password);
+        $valid = $user->validatePassword($model->password);
 
-		if ($valid) {
-			Yii::$app->user->login($user, 0);
-		} else {
-            Yii::$app->session->setFlash('error', "Invalid Username and/or Password");
+
+        if ($valid && User::STATUS_ACTIVE === $user->status) {
+            Yii::$app->user->login($user, 0);
+        } else {
+            if ($user->status !== User::STATUS_ACTIVE) {
+                $valid = false;
+                Yii::$app->session->setFlash('error', "Can't login as account status is {$user->status}");
+            } else {
+                Yii::$app->session->setFlash('error', "Invalid Username and/or Password");
+
+            }
         }
 
-		return $valid;
-	}
+        return $valid;
+    }
 
 }
