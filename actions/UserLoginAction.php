@@ -51,11 +51,8 @@ class UserLoginAction extends \mozzler\base\actions\BaseModelAction
         } else {
             if ($user->status !== User::STATUS_ACTIVE) {
                 $valid = false;
-                Yii::$app->session->setFlash('error', "Can't login as account status is {$user->status}");
-            } else {
-                Yii::$app->session->setFlash('error', "Invalid Username and/or Password");
-
             }
+            Yii::$app->session->setFlash('error', "Invalid Username and/or Password");
         }
 
         return $valid;
