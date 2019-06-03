@@ -11,6 +11,19 @@ use mozzler\auth\models\behaviors\UserSetPasswordHashBehavior;
 use mozzler\auth\models\oauth\OauthAccessToken;
 use yii\helpers\ReplaceArrayValue;
 
+/**
+ * Class User
+ * @package mozzler\auth\models
+ *
+ * @property string $email
+ * @property string $firstName
+ * @property string $lastName
+ * @property string $password
+ * @property string $passwordHash
+ * @property string $status
+ * @property string $passwordResetToken
+ * @property array $roles
+ */
 class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\UserCredentialsInterface
 {
 

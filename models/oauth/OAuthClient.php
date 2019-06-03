@@ -5,6 +5,13 @@ namespace mozzler\auth\models\oauth;
 use mozzler\base\models\behaviors\AuditLogBehaviour;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Class OAuthClient
+ * @package mozzler\auth\models\oauth
+ *
+ * @property string $client_id
+ * @property string $client_secret
+ */
 class OAuthClient extends \mozzler\base\models\Model
 {
 

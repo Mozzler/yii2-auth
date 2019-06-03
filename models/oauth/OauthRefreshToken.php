@@ -8,7 +8,7 @@ use mozzler\auth\models\oauth\OAuthClient;
 /**
  * This is the model class for table "oauth_refresh_tokens".
  *
- * @property string $access_token
+ * @property string $refresh_token
  * @property string $client_id
  * @property integer $user_id
  * @property string $expires
