@@ -133,6 +133,12 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
             'hidden' => true
         ];
 
+        // authkey is used for web sessions
+        $fields['authKey'] = [
+            'type' => 'Text',
+            'hidden' => true
+        ];
+
         return $fields;
     }
 

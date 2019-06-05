@@ -47,7 +47,8 @@ class UserLoginAction extends \mozzler\base\actions\BaseModelAction
 
 
         if ($valid && User::STATUS_ACTIVE === $user->status) {
-            Yii::$app->user->login($user, 0);
+            $duration = Yii::$app->user->authTimeout;
+            Yii::$app->user->login($user, $duration);
         } else {
             if ($user->status !== User::STATUS_ACTIVE) {
                 $valid = false;
