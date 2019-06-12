@@ -195,6 +195,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         $scenarios[self::SCENARIO_SEARCH] = ArrayHelper::merge(['name', 'email'], $adminUpdatePermittedFields);
         $scenarios[self::SCENARIO_REQUEST_PASSWORD_RESET] = ['email'];
         $scenarios[self::SCENARIO_PASSWORD_RESET] = ['email', 'passwordResetToken', 'password'];
+        $scenarios[self::SCENARIO_AUDITABLE] = array_values(array_diff(array_keys($this->modelFields()), ['passwordHash', 'passwordResetToken', 'password', 'authKey', 'updatedAt', 'createdAt', 'createdUserId', 'updatedUserId'])); // Default to all fields except the updated and created auto-generated fields. Note the use of array_values to repack the array after array_diff removes the entries
 
         return $scenarios;
     }
