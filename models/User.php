@@ -139,6 +139,12 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
             'hidden' => true
         ];
 
+        // Automatically set on the EVENT_AFTER_LOGIN https://www.yiiframework.com/doc/api/2.0/yii-web-user
+        $fields['lastLoggedIn'] = [
+            'type' => 'Timestamp',
+            'label' => 'Last logged in'
+        ];
+
         return $fields;
     }
 
@@ -186,11 +192,11 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         }
 
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_LIST] = ArrayHelper::merge(['name', 'email'], $adminUpdatePermittedFields, ['createdAt', 'createdUserId']);
+        $scenarios[self::SCENARIO_LIST] = ArrayHelper::merge(['name', 'email'], $adminUpdatePermittedFields, ['createdAt', 'createdUserId', 'lastLoggedIn']);
         $scenarios[self::SCENARIO_SIGNUP] = ['firstName', 'lastName', 'email', 'password'];
         $scenarios[self::SCENARIO_CREATE] = ArrayHelper::merge(['firstName', 'lastName', 'email', 'password'], $adminUpdatePermittedFields);
         $scenarios[self::SCENARIO_UPDATE] = ArrayHelper::merge(['firstName', 'lastName', 'email', 'password'], $adminUpdatePermittedFields);
-        $scenarios[self::SCENARIO_VIEW] = ArrayHelper::merge(['firstName', 'lastName', 'email'], $adminUpdatePermittedFields, ['createdAt', 'updatedAt']);
+        $scenarios[self::SCENARIO_VIEW] = ArrayHelper::merge(['firstName', 'lastName', 'email'], $adminUpdatePermittedFields, ['createdAt', 'updatedAt', 'lastLoggedIn']);
         $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
         $scenarios[self::SCENARIO_SEARCH] = ArrayHelper::merge(['name', 'email'], $adminUpdatePermittedFields);
         $scenarios[self::SCENARIO_REQUEST_PASSWORD_RESET] = ['email'];
