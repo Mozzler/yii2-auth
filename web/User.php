@@ -12,7 +12,7 @@ class User extends \yii\web\User
     public function afterLogin($identity, $cookieBased, $duration)
     {
         parent::afterLogin($identity, $cookieBased, $duration);
-        \Yii::error("The afterLogin of the Customer is being called");
+        \Yii::debug("The afterLogin of the User {$identity->getId()} is being called and the lastLoggedIn is being set to now: " . time());
         $identity->lastLoggedIn = time();
         $identity->save(true, null, false);
     }
