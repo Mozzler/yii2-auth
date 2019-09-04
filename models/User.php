@@ -157,6 +157,18 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
             'admin' => [
                 'delete' => [
                     'grant' => false
+                ],
+                'insert' => [
+                    'grant' => true
+                ],
+                'view' => [
+                    'grant' => true
+                ],
+                'update' => [
+                    'grant' => true
+                ],
+                'find' => [
+                    'grant' => true
                 ]
             ],
             'registered' => [
