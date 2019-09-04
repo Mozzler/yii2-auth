@@ -16,7 +16,7 @@ class UserApiController extends ActiveController {
     }
 	
 	public static function rbac() {
-		return [
+        return \yii\helpers\ArrayHelper::merge(parent::rbac(), [
 			'registered' => [
 				'create' => [
 					'grant' => false
@@ -28,7 +28,7 @@ class UserApiController extends ActiveController {
 					'grant' => false
 				]
 			]
-		];
+		]);
 	}
 
     public function actionToken()
