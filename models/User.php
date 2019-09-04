@@ -153,14 +153,26 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
      */
     public static function rbac()
     {
+        // NB: This doesn't merge the RBAC from the default Mozzler base model RBAC
         return [
             'admin' => [
                 'delete' => [
-                    'grant' => false
-                ]
+                    'grant' => false // By default don't allow the deletion of users. Instead it's expected you'd set their status to Archived
+                ],
+                'find' => [
+                    'grant' => true
+                ],
+                'insert' => [
+                    'grant' => true
+                ],
+                'update' => [
+                    'grant' => true
+                ],
             ],
+            // Default logged in users (not admin)
             'registered' => [
                 'find' => [
+                    // Only see your own account
                     'grant' => [
                         'class' => 'mozzler\rbac\policies\IsOwnerModelPolicy',
                         'ownerAttribute' => '_id'
@@ -170,6 +182,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
                     'grant' => false,
                 ],
                 'update' => [
+                    // Only update your own account
                     'grant' => [
                         'class' => 'mozzler\rbac\policies\IsOwnerModelPolicy',
                         'ownerAttribute' => '_id'
@@ -178,9 +191,25 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
                 'delete' => [
                     'grant' => false
                 ]
-            ]
+            ],
+            // You may need to enable public insert depending on your project's requirements or create a special endpoint which creates one but ignores permissions.
+            'public' => [
+                'find' => [
+                    'grant' => false
+                ],
+                'insert' => [
+                    'grant' => false
+                ],
+                'update' => [
+                    'grant' => false
+                ],
+                'delete' => [
+                    'grant' => false
+                ]
+            ],
         ];
     }
+
 
     public function scenarios()
     {
