@@ -26,7 +26,7 @@ use yii\helpers\ArrayHelper;
  * ];
  * }
  */
-class UserSetDefaultRolesBehavior extends AttributeBehavior
+class UserSetDefaultRolesBehaviour extends AttributeBehavior
 {
 
     // You should have 'registered' already if the user is
@@ -46,7 +46,7 @@ class UserSetDefaultRolesBehavior extends AttributeBehavior
     protected function getValue($event)
     {
         $model = $event->sender;
-        $roles = array_unique(ArrayHelper::merge($model->roles, $this->defaultRoles)); // Add in the default roles (but prevent any roles being defined multiple times)
+        $roles = array_unique(ArrayHelper::merge(is_array($model->roles) ? $model->roles : [], $this->defaultRoles)); // Add in the default roles (but prevent any roles being defined multiple times)
 
         return $roles;
     }
