@@ -33,7 +33,7 @@ class OauthAccessToken extends Model
     public function rules()
     {
         return [
-            [['access_token', 'client_id'], 'required'],
+            [['access_token', 'client_id', 'expires'], 'required'],
             [['user_id'], 'integer'],
             [['expires'], 'safe'],
             [['access_token'], 'string', 'max' => 40],
@@ -63,7 +63,7 @@ class OauthAccessToken extends Model
                 'label' => 'Client Id',
             ],
             'expires' => [
-                'type' => 'Raw', // Allows for null
+                'type' => 'Timestamp', // The OAuth library doesn't allow this to be null
                 'label' => 'Expires',
             ],
             'user_id' => [
