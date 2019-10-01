@@ -33,7 +33,7 @@ class OauthRefreshToken extends Model
     public function rules()
     {
         return [
-            [['refresh_token', 'client_id', 'expires'], 'required'],
+            [['refresh_token', 'client_id'], 'required'],
             [['user_id'], 'integer'],
             [['expires'], 'safe'],
             [['refresh_token'], 'string', 'max' => 40],
@@ -45,32 +45,6 @@ class OauthRefreshToken extends Model
     public function behaviors()
     {
         return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'refresh_token' => 'Refresh Token',
-            'client_id' => 'Client ID',
-            'user_id' => 'User ID',
-            'expires' => 'Expires',
-            'scope' => 'Scope',
-        ];
-    }
-
-    public function attributes()
-    {
-        return [
-            'refresh_token',
-            'user_id',
-            'expires',
-            'scope',
-            'client_id',
-            '_id',
-        ];
     }
 
     /**
@@ -90,7 +64,7 @@ class OauthRefreshToken extends Model
                 'label' => 'Access Token',
             ],
             'scope' => [
-                'type' => 'Text',
+                'type' => 'Raw', // Allows null
                 'label' => 'Scope',
             ],
             'client_id' => [
@@ -98,7 +72,7 @@ class OauthRefreshToken extends Model
                 'label' => 'Client Id',
             ],
             'expires' => [
-                'type' => 'Timestamp',
+                'type' => 'Raw', // Raw allows null
                 'label' => 'Expires',
             ],
             'user_id' => [

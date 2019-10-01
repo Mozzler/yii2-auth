@@ -63,7 +63,7 @@ class OauthAccessToken extends Model
                 'label' => 'Client Id',
             ],
             'expires' => [
-                'type' => 'Timestamp',
+                'type' => 'Raw', // Allows for null
                 'label' => 'Expires',
             ],
             'user_id' => [
