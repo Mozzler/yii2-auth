@@ -1,7 +1,10 @@
 <?php
+
 namespace mozzler\auth\models\oauth;
+
 use Yii;
 use mozzler\auth\models\oauth\OAuthClient;
+use mozzler\base\models\Model as Model;
 
 /**
  * This is the model class for table "oauth_access_tokens".
@@ -14,7 +17,7 @@ use mozzler\auth\models\oauth\OAuthClient;
  *
  * @property OauthClients $client
  */
-class OauthAccessToken extends \yii\mongodb\ActiveRecord
+class OauthAccessToken extends Model
 {
     /**
      * @inheritdoc
@@ -23,13 +26,14 @@ class OauthAccessToken extends \yii\mongodb\ActiveRecord
     {
         return 'mozzler.auth.access_tokens';
     }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['access_token', 'client_id', 'expires'], 'required'],
+            [['access_token', 'client_id'], 'required'],
             [['user_id'], 'integer'],
             [['expires'], 'safe'],
             [['access_token'], 'string', 'max' => 40],
@@ -37,31 +41,43 @@ class OauthAccessToken extends \yii\mongodb\ActiveRecord
             [['scope'], 'string', 'max' => 2000]
         ];
     }
+
     /**
-     * @inheritdoc
+     * @return array
+     *
+     * These are defined for the preload-data (DataController) to be able to create Access Tokens easily
      */
-    public function attributeLabels()
+    protected function modelFields()
     {
         return [
-            'access_token' => 'Access Token',
-            'client_id' => 'Client ID',
-            'user_id' => 'User ID',
-            'expires' => 'Expires',
-            'scope' => 'Scope',
+            '_id' => [
+                'type' => 'MongoId',
+                'label' => 'ID'
+            ],
+            'access_token' => [
+                'type' => 'Text',
+                'label' => 'Access Token',
+            ],
+            'client_id' => [
+                'type' => 'Text',
+                'label' => 'Client Id',
+            ],
+            'expires' => [
+                'type' => 'Timestamp',
+                'label' => 'Expires',
+            ],
+            'user_id' => [
+                'type' => 'Text',
+                'label' => 'User Id',
+            ],
+            'scope' => [
+                'type' => 'Raw', // Allows for null
+                'label' => 'Scope',
+            ]
         ];
     }
-    
-    public function attributes() {
-	    return [
-		    'access_token',
-		    'user_id',
-		    'expires',
-		    'scope',
-		    'client_id',
-            '_id'
-	    ];
-    }
-    
+
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -69,17 +85,23 @@ class OauthAccessToken extends \yii\mongodb\ActiveRecord
     {
         return $this->hasOne(OauthClients::className(), ['client_id' => 'client_id']);
     }
-    
-    /**
-	 * Find the UserID for a given access token
-	 */
-    public function findUserId($accessToken) {
-	    $clientModel = new OAuthClient();
 
-	    $client = $clientModel->findOne([
-		    'access_token' => $accessToken
-	    ]);
-	    
-	    return is_null($client) ? null : $client['access_token'];
+    /**
+     * Find the UserID for a given access token
+     */
+    public function findUserId($accessToken)
+    {
+        $clientModel = new OAuthClient();
+
+        $client = $clientModel->findOne([
+            'access_token' => $accessToken
+        ]);
+
+        return is_null($client) ? null : $client['access_token'];
+    }
+
+    public function behaviors()
+    {
+        return [];
     }
 }

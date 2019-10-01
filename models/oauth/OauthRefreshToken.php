@@ -4,6 +4,7 @@ namespace mozzler\auth\models\oauth;
 
 use Yii;
 use mozzler\auth\models\oauth\OAuthClient;
+use mozzler\base\models\Model as Model;
 
 /**
  * This is the model class for table "oauth_refresh_tokens".
@@ -16,7 +17,7 @@ use mozzler\auth\models\oauth\OAuthClient;
  *
  * @property OauthClients $client
  */
-class OauthRefreshToken extends \yii\mongodb\ActiveRecord
+class OauthRefreshToken extends Model
 {
     /**
      * @inheritdoc
@@ -39,6 +40,11 @@ class OauthRefreshToken extends \yii\mongodb\ActiveRecord
             [['client_id'], 'string', 'max' => 32],
             [['scope'], 'string', 'max' => 2000]
         ];
+    }
+
+    public function behaviors()
+    {
+        return [];
     }
 
     /**
@@ -64,6 +70,41 @@ class OauthRefreshToken extends \yii\mongodb\ActiveRecord
             'scope',
             'client_id',
             '_id',
+        ];
+    }
+
+    /**
+     * @return array
+     *
+     * These are defined for the preload-data (DataController) to be able to create Refresh Tokens easily
+     */
+    protected function modelFields()
+    {
+        return [
+            '_id' => [
+                'type' => 'MongoId',
+                'label' => 'ID'
+            ],
+            'refresh_token' => [
+                'type' => 'Text',
+                'label' => 'Access Token',
+            ],
+            'scope' => [
+                'type' => 'Text',
+                'label' => 'Scope',
+            ],
+            'client_id' => [
+                'type' => 'Text',
+                'label' => 'Client Id',
+            ],
+            'expires' => [
+                'type' => 'Timestamp',
+                'label' => 'Expires',
+            ],
+            'user_id' => [
+                'type' => 'Integer',
+                'label' => 'User Id',
+            ]
         ];
     }
 
