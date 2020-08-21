@@ -22,6 +22,7 @@ use yii\helpers\ReplaceArrayValue;
  * @property string $passwordHash
  * @property string $status
  * @property string $passwordResetToken
+ * @property string $lastLoggedIn
  * @property array $roles
  */
 class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\UserCredentialsInterface
@@ -247,8 +248,6 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 
         $user = \Yii::$app->user->getIdentity();
 
-        $adminUpdatePermittedFields = [];
-
         // check if user is logged in, has user->roles, and if admin
         if ($user && \Yii::$app->rbac->canAccessModel($this, 'insert')) {
             return true;
@@ -385,6 +384,34 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     {
         $usernameField = static::$usernameField;
         return $this->$usernameField;
+    }
+
+
+    /**
+     * @param $event
+     *
+     * If you would like the lastLoggedIn field to be saved then you'll need to configure the config/web.php to include 'on ' the event trigger.
+     * e.g Something like:
+     *
+     *  'user' => [
+     *    'identityClass' => 'app\models\User',
+     *    'enableAutoLogin' => true,
+     *    'authTimeout' => 86400, // 24hrs
+     *    'on ' . \yii\web\User::EVENT_AFTER_LOGIN => ['app\models\User' , 'handleUpdateLastLoggedIn'],
+     * ],
+     *
+     *
+     */
+    public function handleUpdateLastLoggedIn($event)
+    {
+        // Expecting a Web User after login event
+        try {
+            $user = $event->identity;
+            $user->lastLoggedIn = time();
+            $user->save(true, null, false);
+        } catch (\Throwable $exception) {
+            \Yii::error("Error with handleUpdateLastLoggedIn() Unable to save the last logged in time: " . \Yii::$app->t::returnExceptionAsString($exception));
+        }
     }
 
 }
