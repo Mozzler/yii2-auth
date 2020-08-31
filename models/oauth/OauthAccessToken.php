@@ -34,7 +34,7 @@ class OauthAccessToken extends Model
     {
         return [
             [['access_token', 'client_id', 'expires'], 'required'],
-            [['user_id'], 'integer'],
+            [['user_id'], 'string'],
             [['expires'], 'safe'],
             [['access_token'], 'string', 'max' => 40],
             [['client_id'], 'string', 'max' => 32],
