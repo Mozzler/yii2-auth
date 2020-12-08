@@ -46,9 +46,6 @@ class UserLoginAction extends \mozzler\base\actions\BaseModelAction
 
     protected function login($model)
     {
-        $postLoginRedirect = Yii::$app->getSession()->get('postLoginRedirect');
-        Yii::debug("The postLoginRedirect is: " . VarDumper::export($postLoginRedirect));
-
         $usernameField = $model::$usernameField;
         // NB: We force the email address to be lowercase on login
         $user = $model::findByUsername(strtolower($model->$usernameField));
