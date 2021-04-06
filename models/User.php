@@ -29,7 +29,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 {
 
     public static $moduleClass = '\mozzler\auth\Module';
-    public static $collectionName = "mozzler.auth.user";
+    protected static $collectionName = "mozzler.auth.user";
     public static $usernameField = 'email';
 
     const SCENARIO_SIGNUP = 'signup';
@@ -412,6 +412,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         } catch (\Throwable $exception) {
             \Yii::error("Error with handleUpdateLastLoggedIn() Unable to save the last logged in time: " . \Yii::$app->t::returnExceptionAsString($exception));
         }
+    }
+
+    public static function getCollectionName() {
+        return self::$collectionName;
     }
 
 }
