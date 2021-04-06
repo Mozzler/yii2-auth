@@ -29,7 +29,7 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
 {
 
     public static $moduleClass = '\mozzler\auth\Module';
-    protected static $collectionName = "mozzler.auth.user";
+    public static $collectionName = "mozzler.auth.user";
     public static $usernameField = 'email';
 
     const SCENARIO_SIGNUP = 'signup';
