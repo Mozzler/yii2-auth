@@ -169,6 +169,9 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
                 'update' => [
                     'grant' => true
                 ],
+                'report' => [
+                    'grant' => true
+                ],
             ],
             // Default logged in users (not admin)
             'registered' => [
@@ -191,7 +194,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
                 ],
                 'delete' => [
                     'grant' => false
-                ]
+                ],
+                'report' => [
+                    'grant' => true
+                ],
             ],
             // You may need to enable public insert depending on your project's requirements or create a special endpoint which creates one but ignores permissions.
             'public' => [
@@ -206,7 +212,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
                 ],
                 'delete' => [
                     'grant' => false
-                ]
+                ],
+                'report' => [
+                    'grant' => false
+                ],
             ],
         ];
     }
@@ -414,7 +423,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         }
     }
 
-    public static function getCollectionName() {
+    public static function getCollectionName()
+    {
         return self::$collectionName;
     }
 
