@@ -242,6 +242,15 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
         $scenarios[self::SCENARIO_PASSWORD_RESET] = ['email', 'passwordResetToken', 'password'];
         $scenarios[self::SCENARIO_AUDITABLE] = array_values(array_diff(array_keys($this->modelFields()), ['passwordHash', 'passwordResetToken', 'password', 'authKey', 'updatedAt', 'createdAt', 'createdUserId', 'updatedUserId'])); // Default to all fields except the updated and created auto-generated fields. Note the use of array_values to repack the array after array_diff removes the entries
 
+        // Replace the normal Export scenario with a User specific one that removes the auth related fields
+        $scenarios[self::SCENARIO_EXPORT] = array_keys(array_filter($this->getCachedModelFields(), function ($modelField, $modelKey) {
+            if (in_array($modelKey, ['id', 'passwordHash', 'password', 'passwordResetToken', 'authKey'])) {
+                return false; // Only want '_id' not 'id' otherwise it's doubling up, also don't want the password related fields
+            }
+            // This is used by the CSV export e.g model/export so you don't want to output fields that are relateMany
+            return !($modelField['type'] === 'RelateMany');
+        }, ARRAY_FILTER_USE_BOTH));
+
         return $scenarios;
     }
 
