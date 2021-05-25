@@ -42,7 +42,10 @@ class UserWebController extends ModelController
                 ],
                 'deleteMany' => [
                     'grant' => false
-                ]
+                ],
+                'export' => [
+                    'grant' => false
+                ],
             ],
             'admin' => [
                 'create' => [
@@ -62,7 +65,10 @@ class UserWebController extends ModelController
                 ],
                 'deleteMany' => [
                     'grant' => false
-                ]
+                ],
+                'export' => [
+                    'grant' => true
+                ],
             ],
             'registered' => [
                 'create' => [
@@ -82,7 +88,10 @@ class UserWebController extends ModelController
                 ],
                 'deleteMany' => [
                     'grant' => false
-                ]
+                ],
+                'export' => [
+                    'grant' => false
+                ],
             ]
         ];
     }
