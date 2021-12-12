@@ -27,6 +27,16 @@ class OauthAccessToken extends Model
         return 'mozzler.auth.access_tokens';
     }
 
+    public function modelIndexes()
+    {
+        return [
+            'accessToken' => [
+                // There is a LOT of queries to this for API requests
+                'columns' => ['access_token' => 1],
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */

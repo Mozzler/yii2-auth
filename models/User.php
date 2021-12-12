@@ -60,7 +60,8 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
                     'unique' => true
                 ],
                 'duplicateMessage' => [ucfirst(static::$usernameField) . ' already exists']
-            ]
+            ],
+
         ]);
     }
 

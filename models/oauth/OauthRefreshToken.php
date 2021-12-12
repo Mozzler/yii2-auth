@@ -26,6 +26,14 @@ class OauthRefreshToken extends Model
     {
         return 'mozzler.auth.refresh_tokens';
     }
+    public function modelIndexes()
+    {
+        return [
+            'refreshToken' => [
+                'columns' => ['refresh_token' => 1],
+            ],
+        ];
+    }
 
     /**
      * @inheritdoc

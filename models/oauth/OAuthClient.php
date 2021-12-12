@@ -18,12 +18,46 @@ class OAuthClient extends \mozzler\base\models\Model
     protected static $collectionName = 'mozzler.auth.clients';
     public $controllerRoute = 'auth/oauthclient';
 
-    protected function modelConfig()
+    public static function rbac()
+    {
+        return ArrayHelper::merge(parent::rbac(), [
+            'registered' => [
+                'find' => [
+                    'grant' => false
+                ],
+                'insert' => [
+                    'grant' => false
+                ],
+                'update' => [
+                    'grant' => false
+                ],
+                'delete' => [
+                    'grant' => false
+                ]
+            ]
+        ]);
+    }
+
+    public function modelIndexes()
     {
         return [
-            'label' => 'OAuth Client',
-            'labelPlural' => 'OAuth Clients'
+            'clientId' => [
+                'columns' => ['client_id' => 1],
+            ],
         ];
+    }
+
+    public function scenarios()
+    {
+        return ArrayHelper::merge(parent::scenarios(), [
+            self::SCENARIO_CREATE => ['client_id', 'client_secret'],
+            self::SCENARIO_UPDATE => ['client_id', 'client_secret'],
+            self::SCENARIO_LIST => ['client_id', 'client_secret', 'createdUserId', 'createdAt'],
+            self::SCENARIO_VIEW => ['client_id', 'client_secret', 'createdUserId', 'createdAt'],
+            self::SCENARIO_SEARCH => ['client_id'],
+            self::SCENARIO_EXPORT => ['_id', 'client_id', 'client_secret', 'createdAt', 'createdUserId', 'updatedAt', 'updatedUserId'],
+            self::SCENARIO_DEFAULT => array_keys($this->modelFields()),
+        ]);
     }
 
     protected function modelFields()
@@ -50,37 +84,12 @@ class OAuthClient extends \mozzler\base\models\Model
         ]);
     }
 
-    public function scenarios()
+    protected function modelConfig()
     {
-        return ArrayHelper::merge(parent::scenarios(), [
-            self::SCENARIO_CREATE => ['client_id', 'client_secret'],
-            self::SCENARIO_UPDATE => ['client_id', 'client_secret'],
-            self::SCENARIO_LIST => ['client_id', 'client_secret', 'createdUserId', 'createdAt'],
-            self::SCENARIO_VIEW => ['client_id', 'client_secret', 'createdUserId', 'createdAt'],
-            self::SCENARIO_SEARCH => ['client_id'],
-            self::SCENARIO_EXPORT => ['_id', 'client_id', 'client_secret', 'createdAt', 'createdUserId', 'updatedAt', 'updatedUserId'],
-            self::SCENARIO_DEFAULT => array_keys($this->modelFields()),
-        ]);
-    }
-
-    public static function rbac()
-    {
-        return ArrayHelper::merge(parent::rbac(), [
-            'registered' => [
-                'find' => [
-                    'grant' => false
-                ],
-                'insert' => [
-                    'grant' => false
-                ],
-                'update' => [
-                    'grant' => false
-                ],
-                'delete' => [
-                    'grant' => false
-                ]
-            ]
-        ]);
+        return [
+            'label' => 'OAuth Client',
+            'labelPlural' => 'OAuth Clients'
+        ];
     }
 
 }
