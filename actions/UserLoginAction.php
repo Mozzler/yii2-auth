@@ -63,10 +63,13 @@ class UserLoginAction extends \mozzler\base\actions\BaseModelAction
             $duration = Yii::$app->user->authTimeout;
             Yii::$app->user->login($user, empty($duration) ? 0 : $duration);
         } else {
-            if ($user->status !== User::STATUS_ACTIVE) {
+            if (true === $valid && $user->status !== User::STATUS_ACTIVE) {
                 $valid = false;
+                Yii::$app->session->setFlash('error', "Your user account has been deactivated");
+            } else {
+                Yii::$app->session->setFlash('error', "Invalid Username and/or Password");
             }
-            Yii::$app->session->setFlash('error', "Invalid Username and/or Password");
+
         }
 
         return $valid;
