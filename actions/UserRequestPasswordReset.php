@@ -17,6 +17,7 @@ class UserRequestPasswordReset extends \mozzler\base\actions\BaseModelAction {
 	public function run() {
     	
 		if (!Yii::$app->user->isGuest) {
+            \Yii::$app->session->setFlash('warning', "You are already logged in, no need to request a password reset");
             return $this->controller->goHome();
         }
 
