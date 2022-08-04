@@ -2,6 +2,7 @@
 namespace mozzler\auth\widgets;
 
 use mozzler\base\widgets\BaseWidget;
+use yii\helpers\VarDumper;
 
 class UserRequestPasswordReset extends BaseWidget {
 	
@@ -24,7 +25,15 @@ class UserRequestPasswordReset extends BaseWidget {
 			'usernameField' => 'email'
 		];
 	}
+
+    public function config($templatify = false)
+    {
+        $config = parent::config();
+        if (!empty($config['model']) &&  !empty(\Yii::$app->request->get('email'))) {
+            $config['model']->email = \Yii::$app->request->get('email');
+            \Yii::debug("Setting the default email to be the url provided: " . VarDumper::export($config['model']->email));
+        }
+        return $config;
+    }
 	
 }
-
-?>
