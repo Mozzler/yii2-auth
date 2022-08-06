@@ -66,8 +66,8 @@ class UserRequestPasswordReset extends \mozzler\base\actions\BaseModelAction
         $response = \Yii::$app->t->sendEmail($user->email, $subject, "user/passwordReset.twig", ["user" => $user]);
 
         if ($response) {
-            \Yii::$app->session->setFlash('info', "Reset password request sent to " . $user->email);
-            $this->controller->redirect($user->getUrl('login', ['email' => $user->email]));
+            Yii::$app->session->setFlash('success', "Reset password request sent to <strong>{$user->email}</strong>");
+//            $this->controller->redirect($user->getUrl('login', ['email' => $user->email])); // You can't both have the setFlash AND a redirect, unless you redirect with a special URL param that sets the flash message or something special
             return true;
         }
 
