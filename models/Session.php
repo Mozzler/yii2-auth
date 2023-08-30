@@ -35,12 +35,13 @@ class Session extends Model
     public function modelIndexes()
     {
         return [
-            'idExpire' => [
-                'columns' => [
-                    'id' => 1,
-                    'expire' => -1 // I don't think the expiry is actually required
-                ],
-            ],
+            'idExpire' => ['columns' => [
+                'id' => 1,
+                'expire' => -1
+            ]],
+            'expire' => ['columns' => [
+                'expire' => -1 // I think the garbage collector uses this, it was suggested by the MongoDB Performance Advisor
+            ]],
         ];
     }
 
