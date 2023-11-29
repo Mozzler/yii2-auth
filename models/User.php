@@ -2,6 +2,7 @@
 
 namespace mozzler\auth\models;
 
+use mozzler\base\helpers\FieldHelper;
 use yii\helpers\ArrayHelper;
 use Yii;
 
@@ -436,6 +437,48 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     public static function getCollectionName()
     {
         return self::$collectionName;
+    }
+
+    /**
+     * Init Model Fields
+     *
+     * Don't use the default getCachedModelFields for the User
+     * The cached fields causes issues when initialising fields and the current user hasn't yet been instantiated
+     *
+     * NB: This allows you to manually provide the modelFields so you can adapt the fields as needed, e.g setting some fields to hidden
+     *
+     * Example Usage:
+     *    // -- This is the piece of magic that applies the email hidden change for the displaying in the form
+     *    // Note it's only available on user's where we've overridden the method to allow setting it this way
+     *    $cachedModelFields = $model->getCachedModelFields();
+     *    $cachedModelFields['email']['hidden'] = true;
+     *    $model->initModelFields($cachedModelFields); // Re-set the model fields
+     */
+    public function initModelFields($modelFields = null)
+    {
+        $this->modelFields = FieldHelper::createFields($this, $modelFields ? $modelFields : $this->modelFields());
+    }
+
+    /**
+     * @return User|null
+     * @throws \Throwable
+     *
+     * This is a very common call you'll likely use a lot
+     *
+     * e.g $user = User::getCurrentUser();
+     */
+    public static function getCurrentUser()
+    {
+        if (!\Yii::$app->has('user')) {
+            // -- Likely a CLI request
+            return null;
+        }
+        /** @var User $user */
+        $user = \Yii::$app->user->getIdentity();
+        if (empty($user)) {
+            return null;
+        }
+        return $user;
     }
 
 }
