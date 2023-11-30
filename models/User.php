@@ -11,6 +11,7 @@ use mozzler\auth\models\behaviors\UserSetNameBehavior;
 use mozzler\auth\models\behaviors\UserSetPasswordHashBehavior;
 use mozzler\auth\models\oauth\OauthAccessToken;
 use yii\helpers\ReplaceArrayValue;
+use yii\web\UserEvent;
 
 /**
  * Class User
@@ -33,6 +34,10 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     protected static $collectionName = "mozzler.auth.user";
     public static $usernameField = 'email';
 
+    // Events are from \yii\web\User
+    const EVENT_BEFORE_LOGIN = 'beforeLogin';
+    const EVENT_AFTER_LOGIN = 'afterLogin';
+
     const SCENARIO_SIGNUP = 'signup';
     const SCENARIO_LOGIN = 'login';
     const SCENARIO_REQUEST_PASSWORD_RESET = 'requestPasswordReset';
@@ -41,6 +46,12 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     const STATUS_ACTIVE = 'active';
     const STATUS_ARCHIVED = 'archived';
     const STATUS_PENDING = 'pending';
+
+    public function init()
+    {
+        parent::init();
+        $this->on(self::EVENT_AFTER_LOGIN, [$this, 'handleUpdateLastLoggedIn']); // Add the last logged in time if we can
+    }
 
     protected function modelConfig()
     {
@@ -407,37 +418,91 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
     }
 
 
+    public static function getCollectionName()
+    {
+        return self::$collectionName;
+    }
+
+
+    /**
+     * Copied from \yii\web\User::beforeLogin
+     *
+     * This method is called before logging in a user.
+     * The default implementation will trigger the [[EVENT_BEFORE_LOGIN]] event.
+     * If you override this method, make sure you call the parent implementation
+     * so that the event is triggered.
+     * @param \yii\web\IdentityInterface $identity the user identity information
+     * @param bool $cookieBased whether the login is cookie-based
+     * @param int $duration number of seconds that the user can remain in logged-in status.
+     * If 0, it means login till the user closes the browser or the session is manually destroyed.
+     * @return bool whether the user should continue to be logged in
+     */
+    public function beforeLogin($cookieBased = false, $duration = 0)
+    {
+
+        \Yii::info("Triggering the User Before event");
+        $event = new UserEvent([
+            'identity' => $this,
+            'cookieBased' => $cookieBased,
+            'duration' => $duration,
+        ]);
+        $this->trigger(self::EVENT_BEFORE_LOGIN, $event);
+
+        return $event->isValid;
+    }
+
+    /**
+     * Copied from \yii\web\User::afterLogin
+     *
+     * This method is called after the user is successfully logged in.
+     * The default implementation will trigger the [[EVENT_AFTER_LOGIN]] event.
+     * If you override this method, make sure you call the parent implementation
+     * so that the event is triggered.
+     * @param \yii\web\IdentityInterface $identity the user identity information
+     * @param bool $cookieBased whether the login is cookie-based
+     * @param int $duration number of seconds that the user can remain in logged-in status.
+     * If 0, it means login till the user closes the browser or the session is manually destroyed.
+     */
+    public function afterLogin($cookieBased = false, $duration = 0)
+    {
+        \Yii::info("Triggering the User After Login event");
+        $this->trigger(self::EVENT_AFTER_LOGIN, new UserEvent([
+            'identity' => $this,
+            'cookieBased' => $cookieBased,
+            'duration' => $duration,
+        ]));
+    }
+
     /**
      * @param $event
      *
-     * If you would like the lastLoggedIn field to be saved then you'll need to configure the config/web.php to include 'on ' the event trigger.
-     * e.g Something like:
+     * If you would like the lastLoggedIn field to be saved then you'll need to configure this user model (e.g extending it with your own user model) with an init method
      *
-     *  'user' => [
-     *    'identityClass' => 'app\models\User',
-     *    'enableAutoLogin' => true,
-     *    'authTimeout' => 86400, // 24hrs
-     *    'on ' . \yii\web\User::EVENT_AFTER_LOGIN => ['app\models\User' , 'handleUpdateLastLoggedIn'],
-     * ],
-     *
+     * e.g
+     *  public function init()
+     *  {
+     *    parent::init();
+     *    // Add the event listeners (because doing so in the web controller config doesn't seem to be working)
+     *    $this->on(self::EVENT_BEFORE_LOGIN, [$this, 'handleIsArchivedUser']);
+     *    $this->on(self::EVENT_AFTER_LOGIN, [$this, 'handleUpdateLastLoggedIn']);
+     *  }
      *
      */
     public function handleUpdateLastLoggedIn($event)
     {
         // Expecting a Web User after login event
         try {
+            /** @var User $user */
             $user = $event->identity;
-            $user->lastLoggedIn = time();
-            $user->save(true, null, false);
+            if ($user && $user->hasProperty('lastLoggedIn')) {
+                $user->lastLoggedIn = time();
+                $user->save(true, null, false);
+            }
         } catch (\Throwable $exception) {
             \Yii::error("Error with handleUpdateLastLoggedIn() Unable to save the last logged in time: " . \Yii::$app->t::returnExceptionAsString($exception));
         }
     }
 
-    public static function getCollectionName()
-    {
-        return self::$collectionName;
-    }
 
     /**
      * Init Model Fields
