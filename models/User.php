@@ -123,9 +123,9 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
             'label' => 'Status',
             'default' => self::STATUS_ACTIVE,
             'options' => [
-                'active' => 'Active',
-                'archived' => 'Archived',
-                'pending' => 'Pending'
+                self::STATUS_ACTIVE => 'Active',
+                self::STATUS_ARCHIVED => 'Archived',
+                self::STATUS_PENDING => 'Pending'
             ],
             'required' => true
         ];
