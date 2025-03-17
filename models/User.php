@@ -534,16 +534,16 @@ class User extends Model implements \yii\web\IdentityInterface, \OAuth2\Storage\
      */
     public static function getCurrentUser()
     {
-        if (!\Yii::$app->has('user')) {
-            // -- Likely a CLI request
-            return null;
+        $user = null;
+        if (\Yii::$app->has('user')) {
+            /** @var User $user */
+            $user = \Yii::$app->user->getIdentity();
         }
-        /** @var User $user */
-        $user = \Yii::$app->user->getIdentity();
-        if (empty($user)) {
-            return null;
+        // -- Maybe a CLI call, use the RBAC user as a fallback (which you can set using \Yii::$app->rbac->user = $user)
+        if (!$user && !empty(\Yii::$app->rbac->user)) {
+            $user = \Yii::$app->rbac->user;
         }
-        return $user;
+        return $user ?? null;
     }
 
 }
