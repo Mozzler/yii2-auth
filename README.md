@@ -1,4 +1,16 @@
+## Updates
+
+August 29th 2025 this was updated to support the more updated OAuth interface
+Specifically the yii/oauth/storage/MongoDB.php:setAuthorizationCode() now supports $code_challenge and $code_challenge_method
+
+However updating to this later version might cause backwards compatibility.
+
+If you have issues, use the tagged Github version of this `2025-08-29th-before-code-challenge-updates`
+
+
 ## Installation
+
+
 
 Add the following to the application config:
 

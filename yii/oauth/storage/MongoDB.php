@@ -23,9 +23,9 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         if ($connection instanceof \yii\mongodb\Connection) {
             $this->db = $connection;
         } else {
-	        $this->db = \Yii::$app->get($this->db);
+            $this->db = \Yii::$app->get($this->db);
         }
-        
+
         $this->config = ArrayHelper::merge([
             'client_table' => 'mozzler.auth.clients',
             'access_token_table' => 'mozzler.auth.access_tokens',
@@ -133,7 +133,7 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
             'scope' => $scope
         );
         $result = $this->collection('access_token_table')->insert($token);
-        
+
         return !is_null($result);
     }
 
@@ -142,7 +142,7 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         $result = $this->collection('access_token_table')->remove([
             'access_token' => $access_token
         ]);
-        
+
         return true;
     }
 
@@ -155,11 +155,11 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return is_null($code) ? false : $code;
     }
 
-    public function setAuthorizationCode($code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null)
+    public function setAuthorizationCode($code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null, $code_challenge = null, $code_challenge_method = null)
     {
         // if it exists, update it.
         if ($this->getAuthorizationCode($code)) {
-            $result = $this->collection('code_table')->updateOne(
+            $result = $this->collection('code_table')->update(
                 array('authorization_code' => $code),
                 array('$set' => array(
                     'client_id' => $client_id,
@@ -168,9 +168,11 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
                     'expires' => $expires,
                     'scope' => $scope,
                     'id_token' => $id_token,
+                    'code_challenge' => $code_challenge,
+                    'code_challenge_method' => $code_challenge_method,
                 ))
             );
-            return $result->getMatchedCount() > 0;
+            return $result > 0;
         }
         $token = array(
             'authorization_code' => $code,
@@ -180,18 +182,22 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
             'expires' => $expires,
             'scope' => $scope,
             'id_token' => $id_token,
+            'code_challenge' => $code_challenge,
+            'code_challenge_method' => $code_challenge_method,
         );
         $result = $this->collection('code_table')->insert($token);
 
         return !is_null($result);
     }
 
+
+
     public function expireAuthorizationCode($code)
     {
         $result = $this->collection('code_table')->remove([
             'authorization_code' => $code
         ]);
-        
+
         return true;
     }
 
@@ -201,15 +207,15 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         if ($user = $this->getUser($username)) {
             return $this->checkPassword($user, $password);
         }
-        
+
         return false;
     }
 
     public function getUserDetails($username)
     {
-	    $details = [];
+        $details = [];
         if ($user = $this->getUser($username)) {
-	        return $user->getUserDetails($username);
+            return $user->getUserDetails($username);
         }
         return $details;
     }
@@ -229,7 +235,7 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         if ($this->config['refresh_token_no_expiry']) {
             $expires = null;
         }
-        
+
         $token = array(
             'refresh_token' => $refresh_token,
             'client_id' => $client_id,
@@ -247,7 +253,7 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         $result = $this->collection('refresh_token_table')->remove([
             'refresh_token' => $refresh_token
         ]);
-        
+
         return true;
     }
 
@@ -259,26 +265,32 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
 
     public function getUser($username)
     {
-	    $identity = \Yii::createObject(\Yii::$app->user->identityClass);
-	    $user = $identity::findByUsername($username);
-	    
+        $identity = \Yii::createObject(\Yii::$app->user->identityClass);
+        $user = $identity::findByUsername($username);
+
         //$result = $this->collection('user_table')->findOne(array('username' => $username));
         return is_null($user) ? false : $user;
     }
 
     public function setUser($username, $password, $firstName = null, $lastName = null)
     {
-	    $user = $this->getUser($username);
+        $user = $this->getUser($username);
         if ($user) {
-	        $user->password = $password;
-	        return $user->save();
+            $user->password = $password;
+            return $user->save();
         }
-        
+
         $user = \Yii::createObject(\Yii::$app->user->identityClass);
         $usernameField = $user::$usernameField;
 
         $user->$usernameField = $username;
         $user->password = $password;
+        if ($firstName) {
+            $user->firstName = $firstName;
+        }
+        if ($lastName) {
+            $user->lastName = $lastName;
+        }
         return $user->save();
     }
 
@@ -368,21 +380,30 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
     // Helper function to access a MongoDB collection by `type`:
     protected function collection($name)
     {
-	    $this->ensureRbacDisabled($this->config[$name]);
-	    
+        $this->ensureRbacDisabled($this->config[$name]);
+
         return $this->db->getCollection($this->config[$name]);
     }
-    
+
     /**
-	 * If RBAC is enabled, ignore all oauth related collections
-	 */
+     * If RBAC is enabled, ignore all oauth related collections
+     */
     private function ensureRbacDisabled($collection) {
-	    if (isset(\Yii::$app->rbac)) {
-	    	\Yii::$app->rbac->ignoreCollection($collection);
-	    }
+        if (isset(\Yii::$app->rbac)) {
+            \Yii::$app->rbac->ignoreCollection($collection);
+        }
     }
-    
+
     //for ScopeInterface
-    public function scopeExists($scope){}
-    public function getDefaultScope($client_id = null){}
+    public function scopeExists($scope)
+    {
+        // -- Basic scope validation - can be enhanced based on your needs
+        return !empty($scope);
+    }
+
+    public function getDefaultScope($client_id = null)
+    {
+        // -- Return default scope for client - can be customized based on your needs
+        return null;
+    }
 }
