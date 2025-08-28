@@ -1,4 +1,5 @@
 <?php
+
 namespace mozzler\auth\yii\oauth\storage;
 
 use OAuth2\Storage;
@@ -18,7 +19,7 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
     protected $db = 'mongodb';
     protected $config;
 
-    public function __construct($connection=null, $config = array())
+    public function __construct($connection = null, $config = array())
     {
         if ($connection instanceof \yii\mongodb\Connection) {
             $this->db = $connection;
@@ -34,8 +35,8 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
             'user_table' => 'mozzler.auth.users',
             'jwt_table' => 'mozzler.auth.jwt',
             'jti_table' => 'mozzler.auth.jti',
-            'scope_table'  => 'mozzler.auth.scopes',
-            'key_table'  => 'mozzler.auth.keys',
+            'scope_table' => 'mozzler.auth.scopes',
+            'key_table' => 'mozzler.auth.keys',
             'refresh_token_no_expiry' => true
         ], $config);
     }
@@ -49,19 +50,31 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return false;
     }
 
+    protected function collection($name)
+    {
+        $this->ensureRbacDisabled($this->config[$name]);
+
+        return $this->db->getCollection($this->config[$name]);
+    }
+
+    /* ClientInterface */
+
+    /**
+     * If RBAC is enabled, ignore all oauth related collections
+     */
+    private function ensureRbacDisabled($collection)
+    {
+        if (isset(\Yii::$app->rbac)) {
+            \Yii::$app->rbac->ignoreCollection($collection);
+        }
+    }
+
     public function isPublicClient($client_id)
     {
         if (!$result = $this->collection('client_table')->findOne(array('client_id' => $client_id))) {
             return false;
         }
         return empty($result['client_secret']);
-    }
-
-    /* ClientInterface */
-    public function getClientDetails($client_id)
-    {
-        $result = $this->collection('client_table')->findOne(array('client_id' => $client_id));
-        return is_null($result) ? false : $result;
     }
 
     public function setClientDetails($client_id, $client_secret = null, $redirect_uri = null, $grant_types = null, $scope = null, $user_id = null)
@@ -71,24 +84,32 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
                 array('client_id' => $client_id),
                 array('$set' => array(
                     'client_secret' => $client_secret,
-                    'redirect_uri'  => $redirect_uri,
-                    'grant_types'   => $grant_types,
-                    'scope'         => $scope,
-                    'user_id'       => $user_id,
+                    'redirect_uri' => $redirect_uri,
+                    'grant_types' => $grant_types,
+                    'scope' => $scope,
+                    'user_id' => $user_id,
                 ))
             );
             return $result > 0;
         }
         $client = array(
-            'client_id'     => $client_id,
+            'client_id' => $client_id,
             'client_secret' => $client_secret,
-            'redirect_uri'  => $redirect_uri,
-            'grant_types'   => $grant_types,
-            'scope'         => $scope,
-            'user_id'       => $user_id,
+            'redirect_uri' => $redirect_uri,
+            'grant_types' => $grant_types,
+            'scope' => $scope,
+            'user_id' => $user_id,
         );
         $result = $this->collection('client_table')->insert($client);
         return !is_null($result);
+    }
+
+    /* AccessTokenInterface */
+
+    public function getClientDetails($client_id)
+    {
+        $result = $this->collection('client_table')->findOne(array('client_id' => $client_id));
+        return is_null($result) ? false : $result;
     }
 
     public function checkRestrictedGrantType($client_id, $grant_type)
@@ -100,13 +121,6 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         }
         // if grant_types are not defined, then none are restricted
         return true;
-    }
-
-    /* AccessTokenInterface */
-    public function getAccessToken($access_token)
-    {
-        $token = $this->collection('access_token_table')->findOne(array('access_token' => $access_token));
-        return is_null($token) ? false : $token;
     }
 
     public function setAccessToken($access_token, $client_id, $user_id, $expires, $scope = null)
@@ -137,6 +151,14 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return !is_null($result);
     }
 
+    /* AuthorizationCodeInterface */
+
+    public function getAccessToken($access_token)
+    {
+        $token = $this->collection('access_token_table')->findOne(array('access_token' => $access_token));
+        return is_null($token) ? false : $token;
+    }
+
     public function unsetAccessToken($access_token)
     {
         $result = $this->collection('access_token_table')->remove([
@@ -144,15 +166,6 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         ]);
 
         return true;
-    }
-
-    /* AuthorizationCodeInterface */
-    public function getAuthorizationCode($code)
-    {
-        $code = $this->collection('code_table')->findOne(array(
-            'authorization_code' => $code
-        ));
-        return is_null($code) ? false : $code;
     }
 
     public function setAuthorizationCode($code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null, $code_challenge = null, $code_challenge_method = null)
@@ -190,7 +203,15 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return !is_null($result);
     }
 
+    /* UserCredentialsInterface */
 
+    public function getAuthorizationCode($code)
+    {
+        $code = $this->collection('code_table')->findOne(array(
+            'authorization_code' => $code
+        ));
+        return is_null($code) ? false : $code;
+    }
 
     public function expireAuthorizationCode($code)
     {
@@ -201,7 +222,8 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return true;
     }
 
-    /* UserCredentialsInterface */
+    /* RefreshTokenInterface */
+
     public function checkUserCredentials($username, $password)
     {
         if ($user = $this->getUser($username)) {
@@ -210,6 +232,22 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
 
         return false;
     }
+
+    public function getUser($username)
+    {
+        $identity = \Yii::createObject(\Yii::$app->user->identityClass);
+        $user = $identity::findByUsername($username);
+
+        //$result = $this->collection('user_table')->findOne(array('username' => $username));
+        return is_null($user) ? false : $user;
+    }
+
+    protected function checkPassword($user, $password)
+    {
+        return $user->validatePassword($password);
+    }
+
+    // plaintext passwords are bad!  Override this for your application
 
     public function getUserDetails($username)
     {
@@ -220,7 +258,6 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return $details;
     }
 
-    /* RefreshTokenInterface */
     public function getRefreshToken($refresh_token)
     {
         $token = $this->collection('refresh_token_table')->findOne(array(
@@ -255,21 +292,6 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         ]);
 
         return true;
-    }
-
-    // plaintext passwords are bad!  Override this for your application
-    protected function checkPassword($user, $password)
-    {
-        return $user->validatePassword($password);
-    }
-
-    public function getUser($username)
-    {
-        $identity = \Yii::createObject(\Yii::$app->user->identityClass);
-        $user = $identity::findByUsername($username);
-
-        //$result = $this->collection('user_table')->findOne(array('username' => $username));
-        return is_null($user) ? false : $user;
     }
 
     public function setUser($username, $password, $firstName = null, $lastName = null)
@@ -343,6 +365,8 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return is_null($result) ? false : $result['public_key'];
     }
 
+    // Helper function to access a MongoDB collection by `type`:
+
     public function getPrivateKey($client_id = null)
     {
         if ($client_id) {
@@ -377,24 +401,8 @@ class MongoDB implements Storage\AuthorizationCodeInterface,
         return is_null($result) ? 'RS256' : $result['encryption_algorithm'];
     }
 
-    // Helper function to access a MongoDB collection by `type`:
-    protected function collection($name)
-    {
-        $this->ensureRbacDisabled($this->config[$name]);
-
-        return $this->db->getCollection($this->config[$name]);
-    }
-
-    /**
-     * If RBAC is enabled, ignore all oauth related collections
-     */
-    private function ensureRbacDisabled($collection) {
-        if (isset(\Yii::$app->rbac)) {
-            \Yii::$app->rbac->ignoreCollection($collection);
-        }
-    }
-
     //for ScopeInterface
+
     public function scopeExists($scope)
     {
         // -- Basic scope validation - can be enhanced based on your needs
